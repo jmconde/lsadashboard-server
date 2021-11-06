@@ -1,0 +1,79 @@
+<html>
+    <head>
+        <style>
+            * {
+                font-family: Arial;
+                font-size: 15px;
+                color: #121212;
+            }
+
+            table {
+                margin: auto;
+                margin-top:32px;
+            }
+
+            th, td {
+                padding: 5px;
+            }
+            th {
+                text-align: left;
+                font-weight: bold;
+                border-bottom: 1px solid #666;
+            }
+
+            td {
+                border-bottom: 1px solid #e9e9e9;
+            }
+            tbody tr:nth-child(1) {
+                background-color: #66BB6A;
+            }
+            tbody tr:nth-child(2) {
+                background-color: #81C784;
+            }
+            tbody tr:nth-child(3) {
+                background-color: #9CCC65;
+            }
+            tbody tr:nth-child(4) {
+                background-color: #9CCC65;
+            }
+            tbody tr:nth-child(5) {
+                background-color: #9CCC65;
+            }
+            .danger {
+                background-color: #FF7043;
+            }
+            .wrapper, img {
+                width: 300px;
+                margin: auto;
+            }
+
+        </style>
+    </head>
+    <body>
+        <section>
+            <div class="wrapper">
+                <img src="https://latinstreamingalliance.com/wp-content/uploads/2021/10/LOGO-CARLOS-2-PNG.png" alt="Latin Streaming Alliance">
+            </div>
+            <table cellspacing="0" cellpadding="0">
+                <thead>
+                    <tr>
+                        <th>Pilot</th>
+                        <th>Fight hours</th>
+                        <th>Total Flights</th>
+                        <th>Time per flight</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <% it.users.forEach(function(user) {%>
+                    <tr class="<%= user.class %>">
+                        <td><%= user.name%></td>
+                        <td><%= user.hours%></td>
+                        <td><%= user.flights %></td>
+                        <td><%= user.minutesPerFlight %></td>
+                    </tr>
+                <% }) %>
+                </tbody>
+            </table>
+        </section>
+    </body>
+</html>
