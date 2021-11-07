@@ -1,58 +1,46 @@
-const cheerio = require('cheerio');
-const axios = require('axios');
 const eta = require('eta');
 const path = require('path');
+const moment = require('moment');
+const uniq = require('lodash/uniq')
+const { sortPilots } = require('./helpers/timeHelper');
+const { getLatests } = require('./db/pilotsDB');
+const { decorateLeaderboard } = require('./decorators/pilotsDecorator');
 
-const url = 'https://crew.latinstreamingalliance.com/pilots';
+const { getAirport: getAirportService } = require('./data/airports');
+const { insertAirport, getAirport } = require('./db/airportsDB');
+const { getLastDailyPositions } = require('./db/dailyPositionsDB');
 
-const toMinutes = (str) => {
-    if (!str) { return -1 }
-    let totalMins = 0;
-    if (typeof str !== 'string' || !str.trim()) { return -1 }
-    const arr = str.split(' ');
-    const getValue = (val) => Number(val.substring(0, val.length - 1));
-    arr.forEach(d => {
-        d = d.trim();
-        if (d.endsWith('h')) {
-            totalMins += getValue(d) * 60;
-        } else if (d.endsWith('m')) {
-            totalMins += getValue(d);
+moment.locale('en');
+
+const orderedPilots = async() => {
+    try {
+        const latestsLeaderboards = await getLatests();
+        let latest = latestsLeaderboards.latest.leaderboard.sort(sortPilots);
+        const prevPositions = await getLastDailyPositions();
+        let { lastUpdated } = latestsLeaderboards.latest;
+
+        const locations = uniq(latest.map(d => d.location));
+        const airports = {};
+        for (let index = 0; index < locations.length; index++) {
+            const icao = locations[index];
+            let airport = await getAirport(icao);
+
+            if (!airport) {
+                airport = await getAirportService(icao);
+                airports[icao] = airport;
+                await insertAirport(icao, JSON.parse(JSON.stringify(airport)));
+            } else {
+                airports[icao] = airport.data;
+            }
         }
-    });
-    return totalMins;
-};
 
-const sortPilots = (a, b) => b.minutes - a.minutes;
-
-const orderedPilots = async () => {
-    const response = await axios.get(url);
-    const $ = cheerio.load(response.data);
-    
-    const $userRows = $('#users-table tbody tr');
-    const users = [];
-    $userRows.each((i, row) => {
-        const $row = $(row);
-        const hours = $row.find('td').eq(6).text();
-        const minutes = toMinutes(hours);
-        const flights = Number($row.find('td').eq(5).text());
-        const minutesPerFlight = (minutes / flights);
-
-        const user = {
-            image: $row.find('td').eq(0).find('img').attr('src'),
-            name: $row.find('td').eq(1).find('a').text().trim(),
-            country:$row.find('td').eq(2).find('span').attr('title'),
-            location: $row.find('td').eq(4).text(),
-            flights,
-            hours,
-            minutes,
-            minutesPerFlight: Number.isNaN(minutesPerFlight) ? '-' : minutesPerFlight.toFixed(2),
-            class: minutes < 15 ? 'danger' : ''
-         };
-        // $row.children[0].find('img')
-        users.push(user);
-    });
-
-    return eta.renderFileAsync(path.join(process.cwd(), 'server', 'pilots.eta') , { users: users.sort(sortPilots) });
+        return eta.renderFileAsync(path.join(process.cwd(), 'server', 'templates', 'pilots.eta'), {
+            users: decorateLeaderboard(latest, prevPositions, airports),
+            lastUpdated: moment(lastUpdated).format('dddd MMMM Do YYYY [@] HH:mm:ss')
+        });
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 module.exports = orderedPilots;

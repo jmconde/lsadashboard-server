@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.:: Latin Streaming Alliance - Leader board ::.</title>
+    <link rel="icon" href="https://latinstreamingalliance.com/wp-content/uploads/2021/10/cropped-cafe-32x32.png" sizes="32x32" />
+    <link rel="icon" href="https://latinstreamingalliance.com/wp-content/uploads/2021/10/cropped-cafe-192x192.png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="https://latinstreamingalliance.com/wp-content/uploads/2021/10/cropped-cafe-180x180.png" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css" integrity="sha256-XoaMnoYC5TH6/+ihMEnospgm0J1PM/nioxbOUdnM8HY=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+    <link rel="stylesheet" href="/styles/pilots.css">
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+  </head>
+  <body>
+    <section>
+      <div class="wrapper">
+          <img src="https://latinstreamingalliance.com/wp-content/uploads/2021/10/LOGO-CARLOS-2-PNG.png" alt="Latin Streaming Alliance">
+      </div>
+      <table cellspacing="0" cellpadding="0">
+        <thead>
+          <tr>
+            <th colspan="2">Pilot</th>
+            <th>Current<br>Location</th>
+            <th>Fight hours</th>
+            <th>Total Flights</th>
+            <th>Average Time<br>per flight</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% it.users.forEach(function(user) {%>
+            <tr class="<%= user._decorators._trClasses %>">
+              <td><i class="<%= user._decorators._diff %>"></li></td>
+              <td><%= user.name%></td>
+              <td>
+                <a class="location-link" href="https://opennav.com/airport/<%= user.location %>" target="_blank" 
+                  data-lat="<%= user._decorators._location.lat%>" 
+                  data-lon="<%= user._decorators._location.lon%>"><%= user.location %></a>
+                </td>
+              <td class="centered"><%= user.hours%></td>
+              <td class="centered"><%= user.flights %></td>
+              <td class="centered"><%= user.minutesPerFlight %></td>
+            </tr>
+          <% }) %>
+        </tbody>        
+      </table>
+      <p class="updated centered">Last updated: <%=it.lastUpdated%></p>
+      <div id="map">
+        <div id="map-container"></div>
+      </div>
+    </section>
+    <script src="/scripts/pilots.js"></script>
+  </body>
+</html>

@@ -1,17 +1,7 @@
-const express = require('express');
-const app = express();
-const port = 3100;
-const orderedPilots = require('./server/pilots');
+const { start } = require('./server/server');
+const task = require('./server/tasks/updatedataTask');
 
-app.get('/', (req, res) => {
-    res.send('Hello world II!!')
-});
-
-app.get('/pilots', async (req, res) => {
-    res.set('Content-Type', 'text/html');
-    res.send(Buffer.from(await orderedPilots()));
-});
-
-app.listen(port, () => {
-    console.log(`Example app listening at port ${port}`)
-});
+if (process.env.NODE_ENV !== 'development') {
+    task();
+}
+start();
