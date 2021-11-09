@@ -1,8 +1,9 @@
+const { getClient, getDB } = require('./db');
+
 async function getLatests() {
-    const client = require('./db')();
+    const client = await getClient();
     try {
-        await client.connect();
-        const db = client.db('lab');
+        const db = getDB(client);
         const pilots = db.collection('pilots');
         const cursor = await pilots.find({}).sort({ lastUpdated: -1 }).limit(2).toArray();
         const latest = cursor[0];
@@ -16,12 +17,11 @@ async function getLatests() {
 }
 
 async function insertLeaderboard(leaderboard) {
-    const client = require('./db')();
+    const client = await getClient();
     try {
         const lastUpdatedDate = new Date();
         const lastUpdated = lastUpdatedDate.getTime();
-        await client.connect();
-        const db = client.db('lab');
+        const db = getDB(client);
         const pilots = db.collection('pilots');
 
         const doc = {
@@ -41,9 +41,9 @@ async function insertLeaderboard(leaderboard) {
 }
 
 async function updateLeaderboard() {
+    const client = await getClient();
     try {
-        await client.connect();
-        const db = client.db('lab');
+        const db = getDB(client);
         const pilots = db.collection('pilots');
 
         const filter = { _id: latest._id };

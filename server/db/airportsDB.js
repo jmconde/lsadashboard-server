@@ -1,8 +1,9 @@
+const { getClient, getDB } = require('./db');
+
 async function getAirport(icao) {
-    const client = require('./db')();
+    const client = await getClient();
     try {
-        await client.connect();
-        const db = client.db('lab');
+        const db = getDB(client);
         const pilots = db.collection('airports');
         const airport = await pilots.findOne({ icao }, {});
 
@@ -15,11 +16,10 @@ async function getAirport(icao) {
 }
 
 async function insertAirport(icao, data) {
-    const client = require('./db')();
+    const client = await getClient();
     try {
         const lastUpdated = new Date().getTime();
-        await client.connect();
-        const db = client.db('lab');
+        const db = getDB(client);
         const airports = db.collection('airports');
 
         const doc = {

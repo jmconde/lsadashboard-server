@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  pilots:
+    image: "arhuako/lab:latest"
+    restart: always
+    ports: 
+      - 3100:3100
+    environment:
+      - ENVIRONMENT=development
+      - DATABASE=lab

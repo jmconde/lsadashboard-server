@@ -1,11 +1,10 @@
-const clientGen = require('./db');
+const { getClient, getDB } = require('./db');
 const moment = require('moment');
 
 async function getLastDailyPositions() {
-    const client = clientGen();
+    const client = await getClient();
     try {
-        await client.connect();
-        const db = client.db('lab');
+        const db = getDB(client);
         const dailyPositions = db.collection('dailyPositions');
         const cursor = await dailyPositions.find({}).sort({ lastUpdated: -1 }).limit(1).toArray();
         const latest = cursor[0];
@@ -19,10 +18,9 @@ async function getLastDailyPositions() {
 }
 
 async function insertDailyPositions(positions, date = undefined) {
-    const client = clientGen();
+    const client = await getClient();
     try {
-        await client.connect();
-        const db = client.db('lab');
+        const db = getDB(client);
         const dailyPositions = db.collection('dailyPositions');
         const today = moment(date).utc().startOf('day');
         const doc = {

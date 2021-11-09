@@ -1,5 +1,5 @@
 const { getLastDailyPositions, insertDailyPositions } = require("./dailyPositionsDB");
-const client = require('./db')();
+const { getClient, getDB } = require('./db');
 const { ObjectId } = require('mongodb');
 const { getPilotsData } = require("../data/pilotsScraper");
 const { insertLeaderboard } = require("./pilotsDB");
@@ -16,10 +16,9 @@ async function test() {
 }
 
 async function get() {
-    const client = require('./db')();
+    const client = await getClient();
     try {
-        await client.connect();
-        const db = client.db('lab');
+        const db = getDB(client);
         const pilots = db.collection('pilots');
         const p = await pilots.findOne({ _id: ObjectId('618830b93c3eb30102567451') });
         console.log('p :>> ', p.leaderboard.map(d => d.userId));
@@ -32,9 +31,9 @@ async function get() {
 }
 
 async function updateLeaderboard() {
+    const client = await getClient();
     try {
-        await client.connect();
-        const db = client.db('lab');
+        const db = getDB(client);
         const pilots = db.collection('pilots');
 
         const filter = { _id: latest._id };
