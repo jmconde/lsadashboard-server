@@ -95,3 +95,14 @@ i.diff-down {
 #map-container {
   height: 300px;
   width: 400px; }
+
+.last-flight,
+.last-flight-time {
+  margin: 0;
+  font-size: 70%; }
+
+.last-flight {
+  font-weight: bold; }
+
+.last-flight-time {
+  font-style: italic; }

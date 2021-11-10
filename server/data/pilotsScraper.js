@@ -15,7 +15,6 @@ async function getPilotsData() {
         const seconds = toSeconds(hours);
         const flights = Number($row.find('td').eq(5).text());
         const secondsPerFlight = Math.round((seconds / flights));
-        console.log('==>', $row.find('td').eq(1).find('a').attr('href').split('/').pop());
         const user = {
             userId: $row.find('td').eq(1).find('a').attr('href').split('/').pop(),
             image: $row.find('td').eq(0).find('img').attr('src'),

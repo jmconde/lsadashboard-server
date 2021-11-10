@@ -27,6 +27,7 @@
             <th>Fight hours</th>
             <th>Total Flights</th>
             <th>Average Time<br>per flight</th>
+            <th>Last Flight</th>
           </tr>
         </thead>
         <tbody>
@@ -42,11 +43,17 @@
               <td class="centered"><%= user.hours%></td>
               <td class="centered"><%= user.flights %></td>
               <td class="centered"><%= user.minutesPerFlight %></td>
+              <td class="centered">
+                <% if(user._decorators._lastFlight) {%>
+                <p class="last-flight"><%=user._decorators._lastFlight.origin%> - <%=user._decorators._lastFlight.destination%></p>
+                <p class="last-flight-time"><%=user._decorators._lastFlight.time%></p>
+                <%} else {%>-<%}%>
+              </td>
             </tr>
           <% }) %>
         </tbody>        
       </table>
-      <p class="updated centered">Last updated: <%=it.lastUpdated%></p>
+      <p class="updated centered"><%=it.lastUpdated%> - v<%=it.version%></d>
       <div id="map">
         <div id="map-container"></div>
       </div>

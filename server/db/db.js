@@ -11,7 +11,6 @@ module.exports = {
     },
     getDB: (client) => {
         const DB = process.env.DATABASE || 'lsa_leaderboard';
-        console.log(`database: ${DB}`);
         return client.db(DB)
     }
 };
