@@ -1,18 +1,23 @@
-var locationMap = L.map('map-container');
-var mapEl = document.querySelector('#map');
+const locationMap = L.map('map-container');
+const mapEl = document.querySelector('#map');
+
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {
+    foo: 'bar',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(locationMap);
+
+const layerGroup =  L.layerGroup().addTo(locationMap);
 
 function showLocationMap(ev) {
     ev.stopPropagation();
     ev.preventDefault();
     const target = ev.currentTarget;
     const { lat, lon } = target.dataset;
+    layerGroup.clearLayers();
     document.querySelector('#map-modal').classList.add('is-active');
     locationMap.setView([lat, lon], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {
-        foo: 'bar',
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(locationMap);
-    L.marker([lat, lon]).addTo(locationMap);
+    L.marker([lat, lon]).addTo(layerGroup);
 }
 
 function showRouteMap(ev) {
@@ -20,19 +25,15 @@ function showRouteMap(ev) {
     ev.preventDefault();
     const target = ev.currentTarget;
     const { lat, lon, prevlat, prevlon } = target.dataset;
+    layerGroup.clearLayers();
     document.querySelector('#map-modal').classList.add('is-active');
-    // locationMap.setView([lat, lon], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {
-        foo: 'bar',
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(locationMap);
-    L.marker([lat, lon]).addTo(locationMap);
-    L.marker([prevlat, prevlon]).addTo(locationMap);
+    L.marker([lat, lon]).addTo(layerGroup);
+    L.marker([prevlat, prevlon]).addTo(layerGroup);
     var latlngs = [
         [prevlat, prevlon],
         [lat, lon]
     ];
-    var polyline = L.polyline(latlngs, {color: 'red'}).addTo(locationMap);
+    var polyline = L.polyline(latlngs, {color: 'red'}).addTo(layerGroup);
 
     // zoom the map to the polyline
     locationMap.fitBounds(polyline.getBounds());
