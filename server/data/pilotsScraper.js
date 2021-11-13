@@ -3,6 +3,8 @@ const axios = require('axios');
 const url = 'https://crew.latinstreamingalliance.com/pilots';
 const { toSeconds, formatHours, formatHoursPerFlight, sortPilots } = require('../helpers/timeHelper');
 
+const getCountryCode = classes => classes.split(' ').find((c) => c.startsWith('flag-icon-')).substring(10);
+
 async function getPilotsData() {
     const response = await axios.get(url);
     const $ = cheerio.load(response.data);
@@ -15,11 +17,13 @@ async function getPilotsData() {
         const seconds = toSeconds(hours);
         const flights = Number($row.find('td').eq(5).text());
         const secondsPerFlight = Math.round((seconds / flights));
+        const countryCode = getCountryCode($row.find('td').eq(2).find('span').attr('class'))
         const user = {
             userId: $row.find('td').eq(1).find('a').attr('href').split('/').pop(),
             image: $row.find('td').eq(0).find('img').attr('src'),
             name: $row.find('td').eq(1).find('a').text().trim(),
             country: $row.find('td').eq(2).find('span').attr('title'),
+            countryCode,
             location: $row.find('td').eq(4).text().trim(),
             flights: flights === 0 ? '-' : flights,
             hours: seconds === 0 ? '-' : formatHours(seconds),

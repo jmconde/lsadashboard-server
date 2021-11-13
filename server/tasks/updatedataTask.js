@@ -10,6 +10,7 @@ const { insertDailyPositions } = require('../db/dailyPositionsDB');
 const chalk = require('chalk');
 
 const schedule = process.env.TASK_SCHEDULE || '*/30 * * * *';
+const doNotInsert = process.env.DO_NOT_INSERT == 1;
 
 const task = async() => {
     console.log(chalk `Executing scraper at {blue ${new Date()}} {green (${schedule})}`);
@@ -21,26 +22,32 @@ const task = async() => {
 
         pilotsData.forEach(async(pilot) => {
             const { userId, seconds, name } = pilot;
-            const previousData = latest.find(d => userId == d.userId);
+            const previousData = latest.find(d => userId == d.userId) || 0;
             const diff = seconds - previousData.seconds;
             if (diff > 0) {
                 console.log(chalk `Pilot {yellow ${name}} new flight detected from {red ${previousData.location}} to {green ${pilot.location}}`);
                 const flight = {
                     date: new Date(),
                     pilotId: userId,
-                    origin: pilot.location,
-                    destination: previousData.location,
+                    origin: previousData.location,
+                    destination: pilot.location,
                     seconds: diff
                 };
-                await inserPilotFlight(flight);
+                if (!doNotInsert) {
+                    await inserPilotFlight(flight);
+                }
             }
         });
 
-        insertLeaderboard(pilotsData);
+        if (!doNotInsert) {
+            await insertLeaderboard(pilotsData);
+        }
 
         if (moment().isAfter(moment().utc().endOf('week').subtract(30, 'minutes'))) {
             const positions = pilotsData.map(d => d.userId);
-            await insertDailyPositions(positions);
+            if (!doNotInsert) {
+                await insertDailyPositions(positions);
+            }
         }
     } catch (err) {
         console.error(err);

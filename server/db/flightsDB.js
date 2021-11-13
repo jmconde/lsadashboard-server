@@ -6,7 +6,7 @@ async function getLastFlightByPilot(pilotId) {
     try {
         const db = getDB(client);
         const flights = db.collection('flights');
-        const cursor = await flights.find({ pilotId }).sort({ lastUpdated: -1 }).limit(1).toArray();
+        const cursor = await flights.find({ pilotId }).sort({ date: -1 }).limit(1).toArray();
         const latest = cursor.length ? cursor[0] : undefined;
         return latest;
     } catch (err) {

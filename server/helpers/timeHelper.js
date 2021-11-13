@@ -21,7 +21,7 @@ const leftPadding = (val, y = 2) => {
     return ((10 ** y + val) + '').substring(1);
 };
 
-const sencondsToHoursMinutesSeconds = (totalSecs) => {
+const secondsToHoursMinutesSeconds = (totalSecs) => {
     const seconds = totalSecs % 60;
     const totalMinutes = (totalSecs - seconds) / 60;
     const minutes = totalMinutes % 60;
@@ -30,14 +30,14 @@ const sencondsToHoursMinutesSeconds = (totalSecs) => {
     return { hours, minutes, seconds };
 };
 
-const formatHours = (secs) => {
-    const { hours, minutes, seconds } = sencondsToHoursMinutesSeconds(secs);
-    return `${leftPadding(hours, 3)}h ${leftPadding(minutes)}m`;
+const formatHours = (secs, padding = 3) => {
+    const { hours, minutes, seconds } = secondsToHoursMinutesSeconds(secs);
+    return `${leftPadding(hours, padding)}h ${leftPadding(minutes)}m`;
 }
 
 const formatHoursPerFlight = (secs) => {
-    const { hours, minutes, seconds } = sencondsToHoursMinutesSeconds(secs);
-    return `${leftPadding(hours, 2)}h ${leftPadding(minutes)}m ${leftPadding(seconds)}`;
+    const { hours, minutes, seconds } = secondsToHoursMinutesSeconds(secs);
+    return `${leftPadding(hours, 2)}h ${leftPadding(minutes)}m ${leftPadding(seconds)}s`;
 }
 
 const sortPilots = (a, b) => b.seconds - a.seconds;
@@ -48,4 +48,5 @@ module.exports = {
     formatHours,
     formatHoursPerFlight,
     sortPilots,
+    secondsToHoursMinutesSeconds,
 }

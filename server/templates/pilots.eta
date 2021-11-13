@@ -8,54 +8,96 @@
     <link rel="icon" href="https://latinstreamingalliance.com/wp-content/uploads/2021/10/cropped-cafe-32x32.png" sizes="32x32" />
     <link rel="icon" href="https://latinstreamingalliance.com/wp-content/uploads/2021/10/cropped-cafe-192x192.png" sizes="192x192" />
     <link rel="apple-touch-icon" href="https://latinstreamingalliance.com/wp-content/uploads/2021/10/cropped-cafe-180x180.png" />
+
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css" integrity="sha256-XoaMnoYC5TH6/+ihMEnospgm0J1PM/nioxbOUdnM8HY=" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
     <link rel="stylesheet" href="/styles/pilots.css">
-
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
   </head>
   <body>
-    <section>
-      <div class="wrapper">
-          <img src="https://latinstreamingalliance.com/wp-content/uploads/2021/10/LOGO-CARLOS-2-PNG.png" alt="Latin Streaming Alliance">
+    
+    
+      <div class="container">
+        <section class="section">  
+          <header class="level block">
+            <div class="level-left">
+              <img class="logo" src="https://latinstreamingalliance.com/wp-content/uploads/2021/10/LOGO-CARLOS-2-PNG.png" alt="Latin Streaming Alliance">
+            </div>
+          </header>
+          <table class="table is-striped is-narrow is-fullwidth">
+            <thead>
+              <tr>
+                <th class="has-text-centered">Pilot</th>
+                <th class="has-text-centered">Current Location</th>
+                <th class="has-text-centered">Fight hours</th>
+                <th class="has-text-centered">Total Flights</th>
+                <th class="has-text-centered">Average Time per flight</th>
+                <th class="has-text-centered">Last Flight</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% it.users.forEach(function(user) {%>
+                <tr class="<%= user._decorators._trClasses %>">
+                  <td>
+                    <div class="info-card">
+                      <div class="info-card-first-row"><%= user.name%></div>
+                      <div class="info-card-second-row">
+                        <img src="/images/ranks/<%=user._decorators._rankImageCode.code%>.png" title="<%=user._decorators._rankImageCode.rank%>" alt="<%=user._decorators._rankImageCode.rank%>" class="rank-image">  
+                        <% if(user.countryCode) {%><img src="/images/flags/<%=user.countryCode%>.png" alt="<%=user.country%>" title="<%=user.country%>"><% }%>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="has-text-centered">
+                    <a href="#" class="location-link" data-lat="<%= user._decorators._location.lat%>" 
+                      data-lon="<%= user._decorators._location.lon%>"><%= user.location %></a>
+                    </td>
+                  <td class="has-text-centered">
+                    <i class="arrow-diff <%= user._decorators._diff %>"></i><%= user.hours%>
+                  </td>
+                  <td class="has-text-centered"><%= user.flights %></td>
+                  <td class="has-text-centered"><%= user.minutesPerFlight %></td>
+                  <td class="">
+                    <% if(user._decorators._lastFlight) {%>
+                      <div class="info-card">
+                        <div class="info-card-first-row">
+                          <a href="#" class="route-link" 
+                            data-lat="<%= user._decorators._location.lat%>" 
+                            data-lon="<%= user._decorators._location.lon%>"
+                            data-prevlat="<%= user._decorators._previousLocation.lat%>" 
+                            data-prevlon="<%= user._decorators._previousLocation.lon%>">
+                            <%=user._decorators._lastFlight.origin%> - <%=user._decorators._lastFlight.destination%>
+                          </a>
+                        </div>
+                        <div class="info-card-second-row">
+                          <div class="tags has-addons">
+                            <span class="tag is-info"><%=user._decorators._lastFlight.fromNow%></span>
+                            <span class="tag is-info is-light"><%=user._decorators._lastFlight.time%></span>
+                          </div>
+                        </div>
+                      
+                      </div>
+                    <%}%>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>        
+          </table>
+        </section>
       </div>
-      <table cellspacing="0" cellpadding="0">
-        <thead>
-          <tr>
-            <th colspan="2">Pilot</th>
-            <th>Current<br>Location</th>
-            <th>Fight hours</th>
-            <th>Total Flights</th>
-            <th>Average Time<br>per flight</th>
-            <th>Last Flight</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% it.users.forEach(function(user) {%>
-            <tr class="<%= user._decorators._trClasses %>">
-              <td><i class="<%= user._decorators._diff %>"></li></td>
-              <td><%= user.name%></td>
-              <td>
-                <a class="location-link" href="https://opennav.com/airport/<%= user.location %>" target="_blank" 
-                  data-lat="<%= user._decorators._location.lat%>" 
-                  data-lon="<%= user._decorators._location.lon%>"><%= user.location %></a>
-                </td>
-              <td class="centered"><%= user.hours%></td>
-              <td class="centered"><%= user.flights %></td>
-              <td class="centered"><%= user.minutesPerFlight %></td>
-              <td class="centered">
-                <% if(user._decorators._lastFlight) {%>
-                <p class="last-flight"><%=user._decorators._lastFlight.origin%> - <%=user._decorators._lastFlight.destination%></p>
-                <p class="last-flight-time"><%=user._decorators._lastFlight.time%></p>
-                <%} else {%>-<%}%>
-              </td>
-            </tr>
-          <% }) %>
-        </tbody>        
-      </table>
-      <p class="updated centered"><%=it.lastUpdated%> - v<%=it.version%></d>
-      <div id="map">
-        <div id="map-container"></div>
+      <footer class="footer">
+        <div class="content has-text-centered">
+          <p>Last updated: <%=it.lastUpdated%> - v<%=it.version%></p>
+          <p>Powered by: Gairacalabs</p>
+        </div>
+      </footer>
+      <div id="map-modal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+          <div id="map-container"></div>
+        </div>
+        <button class="modal-close is-large" aria-label="close"></button>
       </div>
     </section>
     <script src="/scripts/pilots.js"></script>
