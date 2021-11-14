@@ -1,6 +1,14 @@
 const cron = require('node-cron');
 const _isEqual = require('lodash/isEqual');
 const moment = require('moment');
+console.log('=>', moment.locale());
+moment.locale('en');
+moment.updateLocale('en', {
+    week: {
+        dow: 1,
+        doy: 7
+    }
+});
 
 const { getLatests, insertLeaderboard } = require('../db/pilotsDB');
 const { inserPilotFlight } = require('../db/flightsDB');
@@ -43,7 +51,7 @@ const task = async() => {
             await insertLeaderboard(pilotsData);
         }
 
-        if (moment().isAfter(moment().utc().endOf('week').subtract(30, 'minutes'))) {
+        if (moment().isAfter(moment().utc().endOf('week').subtract(15, 'minutes'))) {
             const positions = pilotsData.map(d => d.userId);
             if (!doNotInsert) {
                 await insertDailyPositions(positions);

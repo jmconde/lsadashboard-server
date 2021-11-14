@@ -42,10 +42,12 @@
                 <tr class="<%= user._decorators._trClasses %>">
                   <td>
                     <div class="info-card">
-                      <div class="info-card-first-row"><%= user.name%></div>
+                      <div class="info-card-first-row">
+                        <%= user.name%>
+                      </div>
                       <div class="info-card-second-row">
-                        <img src="/images/ranks/<%=user._decorators._rankImageCode.code%>.png" title="<%=user._decorators._rankImageCode.rank%>" alt="<%=user._decorators._rankImageCode.rank%>" class="rank-image">  
-                        <% if(user.countryCode) {%><img src="/images/flags/<%=user.countryCode%>.png" alt="<%=user.country%>" title="<%=user.country%>"><% }%>
+                        <img src="/images/ranks/<%=user._decorators._rankImageCode.code%>.png" title="<%=user._decorators._rankImageCode.rank%>" alt="<%=user._decorators._rankImageCode.rank%>" class="rank-image">
+                        <% if(user.countryCode) {%><img src="/images/flags/<%=user.countryCode%>.png" alt="<%=user.country%>" title="<%=user.country%>"><%} %>
                       </div>
                     </div>
                   </td>
@@ -72,8 +74,9 @@
                         </div>
                         <div class="info-card-second-row">
                           <div class="tags has-addons">
-                            <span class="tag is-info"><%=user._decorators._lastFlight.fromNow%></span>
-                            <span class="tag is-info is-light"><%=user._decorators._lastFlight.time%></span>
+                            <span class="tag is-light is-success"><%=user._decorators._distance%>nm</span>
+                            <span class="tag is-light is-primary"><%=user._decorators._lastFlight.time%></span>
+                            <span class="tag is-light is-info"><%=user._decorators._lastFlight.fromNow%></span>
                           </div>
                         </div>
                       

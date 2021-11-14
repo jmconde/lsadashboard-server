@@ -3,6 +3,7 @@ const { formatHours } = require('../helpers/timeHelper');
 const moment = require('moment');
 const { mapRank } = require('../helpers/pilotHelper');
 const { getAirport } = require('../data/airports');
+const haversine = require('haversine-distance');
 
 const trClasses = (d) => {
     const classes = [];
@@ -55,13 +56,18 @@ async function decorateLeaderboard(leaderboard, previous, airports) {
     for (let i = 0; i < leaderboard.length; i++) {
         const d = leaderboard[i];
         const lastFl = await lastFlight(d);
+        const originLocation = lastFl ? await airportLocation(lastFl.origin, airports) : undefined;
+        const destLocation = await airportLocation(d.location, airports);
+        const distanceInMeters = lastFl && haversine(originLocation, destLocation);
+        const distance = Math.round(distanceInMeters / 1852);
         const decorators = {
             _trClasses: trClasses(d),
             _diff: progressDiff(d, i, previous),
-            _location: await airportLocation(d.location, airports),
-            _previousLocation: lastFl ? await airportLocation(lastFl.origin, airports) : undefined,
+            _location: destLocation,
+            _previousLocation: originLocation,
             _lastFlight: lastFl,
-            _rankImageCode: rankImageCode(d)
+            _rankImageCode: rankImageCode(d),
+            _distance: Number.isNaN(distance) ? 0 : distance
         };
         d._decorators = decorators;
     }

@@ -7869,11 +7869,14 @@ a.has-text-danger-dark:hover, a.has-text-danger-dark:focus {
   width: 150px; }
 
 .rank-image {
-  width: 24px; }
+  width: 28px; }
 
 .info-card-first-row {
   font-size: 15px;
   font-weight: 600; }
+
+.info-card-second-row .tag {
+  font-weight: 400; }
 
 .danger {
   background-color: #FEFFEC !important; }
