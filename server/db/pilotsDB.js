@@ -63,8 +63,26 @@ async function updateLeaderboard() {
     }
 }
 
+const getLastWeekLeaderboard = async () => {
+    const client = await getClient();
+    try {
+        const db = getDB(client);
+        const pilots = db.collection('pilots');
+
+        const cursor = await pilots.find({lastUpdatedDate: { $lt: moment().startOf('week').toDate() }}).sort({ lastUpdated: -1 }).limit(1).toArray();
+        const leaderboard = cursor[0]?.leaderboard;
+        return leaderboard
+    } catch (err) {
+        console.error(err);
+
+    } finally {
+        await client.close();
+    }
+}
+
 module.exports = {
     getLatests,
+    getLastWeekLeaderboard,
     insertLeaderboard,
     updateLeaderboard
 };
