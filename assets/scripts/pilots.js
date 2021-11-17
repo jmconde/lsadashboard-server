@@ -1,6 +1,23 @@
 const locationMap = L.map('map-container');
 const mapEl = document.querySelector('#map');
 
+const markerTakeoff = L.icon({
+    iconUrl: '/images/marker-takeoff.png',
+    iconSize: [21, 32],
+    iconAnchor: [10, 32]
+});
+
+const markerLanding = L.icon({
+    iconUrl: '/images/marker-landing.png',
+    iconSize: [21, 32],
+    iconAnchor: [10, 32]
+});
+
+const markerHere = L.icon({
+    iconUrl: '/images/marker-here.png',
+    iconSize: [21, 32],
+    iconAnchor: [10, 32]
+});
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {
     foo: 'bar',
@@ -17,7 +34,7 @@ function showLocationMap(ev) {
     layerGroup.clearLayers();
     document.querySelector('#map-modal').classList.add('is-active');
     locationMap.setView([lat, lon], 12);
-    L.marker([lat, lon]).addTo(layerGroup);
+    L.marker([lat, lon], { icon: markerHere }).addTo(layerGroup);
 }
 
 function showRouteMap(ev) {
@@ -27,13 +44,17 @@ function showRouteMap(ev) {
     const { lat, lon, prevlat, prevlon } = target.dataset;
     layerGroup.clearLayers();
     document.querySelector('#map-modal').classList.add('is-active');
-    L.marker([lat, lon]).addTo(layerGroup);
-    L.marker([prevlat, prevlon]).addTo(layerGroup);
+    L.marker([lat, lon], { icon: markerLanding }).addTo(layerGroup);
+    L.marker([prevlat, prevlon], {icon: markerTakeoff}).addTo(layerGroup);
     var latlngs = [
         [prevlat, prevlon],
         [lat, lon]
     ];
-    var polyline = L.polyline(latlngs, {color: 'red'}).addTo(layerGroup);
+    var polyline = L.polyline(latlngs, {
+        color: '#DA53D4',
+        weight: 1,
+        dashArray: '6 3 2 3'
+    }).addTo(layerGroup);
 
     // zoom the map to the polyline
     locationMap.fitBounds(polyline.getBounds());
