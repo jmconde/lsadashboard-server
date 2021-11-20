@@ -1,5 +1,6 @@
 const { MongoClient } = require('mongodb');
 const moment = require('moment');
+const axios = require('axios');
 const uri = 'mongodb://root:qwerty123@192.168.1.124:37017';
 
 const getClient = async() => {
@@ -31,4 +32,17 @@ const doyourthing = async() => {
     }
 }
 
-doyourthing()
+//doyourthing()
+
+async function  req() {
+    const url = `https://crew.latinstreamingalliance.com/api/acars`;
+    const response = await axios.get(url);
+    return response.data;
+}
+
+async function show() {
+    const r = await req();
+    console.log(r);
+}
+
+show();

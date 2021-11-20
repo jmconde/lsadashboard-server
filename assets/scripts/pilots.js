@@ -19,8 +19,15 @@ const markerHere = L.icon({
     iconAnchor: [10, 32]
 });
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {
-    foo: 'bar',
+const tiles = [
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+    'http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+    'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
+    'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png'
+];
+
+L.tileLayer(tiles[4], {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(locationMap);
 
