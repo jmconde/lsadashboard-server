@@ -5,7 +5,7 @@ async function getLatests() {
     try {
         const db = getDB(client);
         const pilots = db.collection('pilots');
-        const cursor = await pilots.find({}).sort({ lastUpdated: -1 }).limit(2).toArray();
+        const cursor = await pilots.find({}).sort({ lastUpdatedDate: -1 }).limit(2).toArray();
         const latest = cursor[0];
         const previous = cursor[1];
         return { latest, previous };

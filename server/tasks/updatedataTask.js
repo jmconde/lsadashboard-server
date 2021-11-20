@@ -1,5 +1,4 @@
 const cron = require('node-cron');
-const _isEqual = require('lodash/isEqual');
 const moment = require('moment');
 console.log('=>', moment.locale());
 moment.locale('en');

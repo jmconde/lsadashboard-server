@@ -117,6 +117,10 @@
     font-size: 15px;
 }
 
+.leaflet-control-attribution, .leaflet-control-attribution a {
+    font-size:10px !important;
+}
+
 #map-container {
     height: 80vh;
 }

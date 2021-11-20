@@ -23,16 +23,37 @@ const doyourthing = async() => {
         const db = getDB(client);
 
         const pilots = db.collection('pilots');
-        const cursor = await pilots.find({lastUpdatedDate: { $lt: moment().startOf('week').toDate() }}).sort({ lastUpdated: -1 }).limit(1).toArray();
-        const lastUpdated = cursor[0]?.lastUpdatedDate;
 
-        console.log(lastUpdated);
+        const cursor = await pilots.find({ lastUpdatedDate: {$exists: false } }).toArray();
+
+        console.log(cursor.length);
+        cursor.forEach(async (c) => {
+            client = await getClient();
+            const db = getDB(client);
+
+            const pilots = db.collection('pilots');
+            console.log(c.date);
+            const filter = { _id: c._id };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    lastUpdatedDate: new Date(c.lastUpdated)
+                },
+            };
+            await pilots.updateOne(filter, updateDoc, options);
+        //     await pilots.updateOne
+        });
+
+        // const cursor = await pilots.find({lastUpdatedDate: { $lt: moment().startOf('week').toDate() }}).sort({ lastUpdated: -1 }).limit(1).toArray();
+        // const lastUpdated = cursor[0]?.lastUpdatedDate;
+
+        // console.log(lastUpdated);
     } finally {
         (await client).close();
     }
 }
 
-//doyourthing()
+// doyourthing()
 
 async function  req() {
     const url = `https://crew.latinstreamingalliance.com/api/acars`;

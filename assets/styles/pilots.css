@@ -7851,6 +7851,9 @@ a.has-text-danger-dark:hover, a.has-text-danger-dark:focus {
   font-family: 'Open Sans', sans-serif;
   font-size: 15px; }
 
+.leaflet-control-attribution, .leaflet-control-attribution a {
+  font-size: 10px !important; }
+
 #map-container {
   height: 80vh; }
 

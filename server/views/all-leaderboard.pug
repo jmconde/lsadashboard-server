@@ -1,0 +1,62 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title .:: Latin Streaming Alliance - Leader board ::.
+  
+    link(rel="icon", href="https://latinstreamingalliance.com/wp-content/uploads/2021/10/cropped-cafe-32x32.png", sizes="32x32")
+    link(rel="icon", href="https://latinstreamingalliance.com/wp-content/uploads/2021/10/cropped-cafe-192x192.png", sizes="192x192")
+    link(rel="apple-touch-icon", href="https://latinstreamingalliance.com/wp-content/uploads/2021/10/cropped-cafe-180x180.png")
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css", integrity="sha256-XoaMnoYC5TH6/+ihMEnospgm0J1PM/nioxbOUdnM8HY=", crossorigin="anonymous")    
+    link(rel="stylesheet", href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css", integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==", crossorigin="")
+    link(rel="stylesheet", href="/styles/pilots.css")
+    script(src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js",  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==", crossorigin="") 
+  body
+    .container
+      section.section
+        include includes/header.pug
+        table.table.is-striped.is-narrow.is-fullwidth
+          thead
+            tr
+              th.has-text-centered Pilot
+              th.has-text-centered Current Location
+              th.has-text-centered Fight hours
+              th.has-text-centered Total Flights
+              th.has-text-centered Average Time per flight
+              th.has-text-centered Last Flight
+          tbody
+            each user in pilots
+              tr(class=user._decorators._trClasses)
+                td
+                  .info-card 
+                    .info-card-first-row #{user.name}
+                    .info-card-second-row
+                    img.rank-image(src="/images/ranks/" + user._decorators._rankImageCode.code +".png", alt=user._decorators._rankImageCode.rank)
+                    if user.countryCode
+                      img(src="/images/flags/" + user.countryCode + ".png", alt=user.country, title=user.country)
+                td.has-text-centered
+                  a(href="#", class="location-link", data-lat=user._decorators._location.lat, data-lon=user._decorators._location.lon) #{user.location}
+                td.has-text-centered
+                  i(class="arrow-diff " + user._decorators._diff)
+                  span #{user.hours}
+                td.has-text-centered #{user.flights}
+                td.has-text-centered #{user.minutesPerFlight}
+                td
+                  if user._decorators._lastFlight
+                    .info-card-first-row
+                      a.route-link(href="#", data-lat=user._decorators._location.lat, data-lon=user._decorators._location.lon, data-prevlat=user._decorators._previousLocation.lat,  data-prevlon=user._decorators._previousLocation.lon) #{user._decorators._lastFlight.origin} - #{user._decorators._lastFlight.destination}
+                    .info-card-second-row
+                      .tag.has-addons 
+                        span.tag.is-light.is-success #{user._decorators._distance}nm
+                        span.tag.is-light.is-primary #{user._decorators._lastFlight.time}
+                        span.tag.is-light.is-info #{user._decorators._lastFlight.fromNow}
+    include includes/footer.pug
+    #map-modal.modal 
+      .modal-background 
+      .modal-content 
+        #map-container 
+      button.modal-close.is-large(aria-label="close")
+
+    script(src="/scripts/pilots.js") 

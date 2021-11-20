@@ -27,7 +27,7 @@ const tiles = [
     'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png'
 ];
 
-L.tileLayer(tiles[4], {
+L.tileLayer(tiles[0], {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(locationMap);
 

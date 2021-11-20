@@ -1,0 +1,25 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title .:: Latin Streaming Alliance - Dashboard (Beta) ::.
+
+    link(rel="stylesheet", href="/styles/pilots.css")
+    script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")
+    script(src="/scripts/dashboard.js")
+  body
+    .container
+      section.section
+        include includes/header
+        .tile.is-ancestor
+          .tile.is-parent
+            .tile.is-child.box
+              p.title Panel 1
+          .tile.is-parent
+            .tile.is-child.box
+              p.title Panel 2
+          .tile.is-parent
+            .tile.is-child.box
+              p.title Panel 3
