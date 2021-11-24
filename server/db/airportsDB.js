@@ -5,8 +5,7 @@ async function getAirport(icao) {
     try {
         const db = getDB(client);
         const pilots = db.collection('airports');
-        const airport = await pilots.findOne({ icao }, {});
-
+        const airport = await pilots.findOne({ icao }, {});       
         return airport;
     } catch (err) {
         console.error(err);

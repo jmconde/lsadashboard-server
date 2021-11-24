@@ -1,5 +1,21 @@
 @charset "utf-8";
-@import "../node_modules/bulma/bulma.sass";
+
+$box-shadow: 1px 1px #eee;
+$box-padding: 8px;
+
+@import "../node_modules/bulma/sass/utilities/_all.sass";
+@import "../node_modules/bulma/sass/base/_all.sass";
+@import "../node_modules/bulma/sass/components/modal.sass";
+@import "../node_modules/bulma/sass/elements/box.sass";
+@import "../node_modules/bulma/sass/elements/container.sass";
+@import "../node_modules/bulma/sass/elements/table.sass";
+@import "../node_modules/bulma/sass/elements/tag.sass";
+@import "../node_modules/bulma/sass/elements/title.sass";
+@import "../node_modules/bulma/sass/layout/section.sass";
+@import "../node_modules/bulma/sass/layout/footer.sass";
+// dashbboard
+@import "../node_modules/bulma/sass/grid/_all.sass";
+
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,500;1,300&display=swap');
 
 // * {
@@ -125,28 +141,12 @@
     height: 80vh;
 }
 
-.arrow-diff {
-    margin-right: 5px;
-
-    &.fa {
-        font-size: 12px;
-    }
-    &.diff-stable {
-        color: #e8e8e8;
-    }
-    &.diff-up {
-        color: green;
-    }
-    &.diff-down {
-        color: red;
-    }
-}
-
 .logo {
     width: 150px;
 }
 .rank-image {
     width: 28px;
+    margin-right: 4px;
 }
 .info-card {
     &-first-row{

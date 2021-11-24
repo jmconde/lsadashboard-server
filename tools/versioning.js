@@ -1,6 +1,6 @@
 const semver = require('semver');
 const path = require('path');
-const { AutoComplete, Input } = require('enquirer');
+const { AutoComplete, Input, Confirm} = require('enquirer');
 const packagePath = path.join(process.cwd(), 'package.json');
 const fs = require('fs-extra');
 const chalk = require('chalk');
@@ -21,10 +21,15 @@ const first = new AutoComplete({
         'prerelease',
     ]
 });
+
 const second = new Input({
     message: 'Type the pre-id',
     initial: 'beta'
 });
+
+// prompt.run()
+//   .then(answer => console.log('Answer:', answer));
+// })
 
 async function ask() {
     let version;
@@ -40,9 +45,15 @@ async function ask() {
         }
         const nextver = semver.inc(version, level, preid);
 
-        package.version = nextver;
+        const confirmation = await new Confirm({
+            name: 'question',
+            message: `Confirm next version '${nextver}'?`
+          }).run();
 
-        fs.writeJSONSync(packagePath, package, { spaces: 2 });
+          if (confirmation) {
+            package.version = nextver;
+            fs.writeJSONSync(packagePath, package, { spaces: 2 });
+        }
     } catch (err) {
         if (typeof err === 'string' && !err) {
             console.log(chalk `{yellow skipping...}`);

@@ -9,35 +9,35 @@ const port = 3100;
 
 function start() {
     const app = express();
-    app.use(express.static('assets'));
-    app.use(bodyParser.json());
     app.use(cors());
+    app.use(express.static('assets'));
+    // app.use('/beta', express.static('static'));
+    app.use(bodyParser.json());
     
     app.set('views', path.join(__dirname, 'views'));
     app.set('view engine', 'pug');
 
+    app.use(function (req, res, next) {
+        console.log('Time:', Date.now(), req.path);
+        next();
+    })
+
     app.use('/api', apiRouter);
 
-    app.get('/', (req, res) => {
-        res.render('index', {
-          subject: 'Pug template engine',
-          name: 'our template',
-          link: 'https://google.com'
-        });
-    });
+    // app.get('/', (req, res) => {
+    //     res.render('index', {
+    //       subject: 'Pug template engine',
+    //       name: 'our template',
+    //       link: 'https://google.com'
+    //     });
+    // });
 
     app.get('/dashboard', (req, res) => {
         res.render('dashboard');
     });
 
     app.get('/pilots', async (req, res) => {
-        try {
-            const data = await orderedPilots();
-            console.log(data);
-            res.render('all-leaderboard', data);
-        } catch(err) {
-            console.error(err);
-        }
+        res.redirect('http://gairacalabs.xyz:8080');
     })
 
     app.listen(port, () => {
