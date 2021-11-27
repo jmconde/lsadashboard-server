@@ -14,8 +14,8 @@ function start() {
     // app.use('/beta', express.static('static'));
     app.use(bodyParser.json());
     
-    app.set('views', path.join(__dirname, 'views'));
-    app.set('view engine', 'pug');
+    // app.set('views', path.join(__dirname, 'views'));
+    // app.set('view engine', 'pug');
 
     app.use(function (req, res, next) {
         console.log('Time:', Date.now(), req.path);
@@ -32,9 +32,9 @@ function start() {
     //     });
     // });
 
-    app.get('/dashboard', (req, res) => {
-        res.render('dashboard');
-    });
+    // app.get('/dashboard', (req, res) => {
+    //     res.render('dashboard');
+    // });
 
     app.get('/pilots', async (req, res) => {
         res.redirect('http://gairacalabs.xyz:8080');

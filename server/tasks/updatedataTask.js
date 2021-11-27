@@ -9,11 +9,11 @@ moment.updateLocale('en', {
     }
 });
 
-const { getLatests, insertLeaderboard } = require('../db/pilotsDB');
-const { inserPilotFlight } = require('../db/flightsDB');
+const { getLatests, insertLeaderboard } = require('../db/mongo/pilotsDB');
+const { inserPilotFlight } = require('../db/mongo/flightsDB');
+const { insertDailyPositions } = require('../db/mongo/dailyPositionsDB');
 const { getPilotsData } = require('../data/pilotsScraper');
 const { sortPilots } = require('../helpers/timeHelper');
-const { insertDailyPositions } = require('../db/dailyPositionsDB');
 const chalk = require('chalk');
 
 const schedule = process.env.TASK_SCHEDULE || '*/30 * * * *';

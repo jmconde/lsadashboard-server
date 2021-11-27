@@ -1,10 +1,10 @@
-const { getClient, getDB } = require('./db');
+const { getMongoConnection, getMongoDatabase } = require('../mongoDBPool');
 const moment = require('moment');
 
 async function getLastDailyPositions() {
-    const client = await getClient();
+    const client = await getMongoConnection();
     try {
-        const db = getDB(client);
+        const db = getMongoDatabase(client);
         const dailyPositions = db.collection('dailyPositions');
         const cursor = await dailyPositions.find({}).sort({ lastUpdated: -1 }).limit(1).toArray();
         const latest = cursor[0];
@@ -18,9 +18,9 @@ async function getLastDailyPositions() {
 }
 
 async function insertDailyPositions(positions, date = undefined) {
-    const client = await getClient();
+    const client = await getMongoConnection();
     try {
-        const db = getDB(client);
+        const db = getMongoDatabase(client);
         const dailyPositions = db.collection('dailyPositions');
         const today = moment(date).utc().startOf('day');
         const doc = {

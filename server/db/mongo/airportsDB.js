@@ -1,9 +1,9 @@
-const { getClient, getDB } = require('./db');
+const { getMongoConnection, getMongoDatabase } = require('../mongoDBPool');
 
 async function getAirport(icao) {
-    const client = await getClient();
+    const client = await getMongoConnection();
     try {
-        const db = getDB(client);
+        const db = getMongoDatabase(client);
         const pilots = db.collection('airports');
         const airport = await pilots.findOne({ icao }, {});       
         return airport;
@@ -15,10 +15,10 @@ async function getAirport(icao) {
 }
 
 async function insertAirport(icao, data) {
-    const client = await getClient();
+    const client = await getMongoConnection();
     try {
         const lastUpdated = new Date().getTime();
-        const db = getDB(client);
+        const db = getMongoDatabase(client);
         const airports = db.collection('airports');
 
         const doc = {

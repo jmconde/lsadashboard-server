@@ -1,10 +1,10 @@
-const { getClient, getDB } = require('./db');
+const { getMongoConnection, getMongoDatabase } = require('../mongoDBPool');
 const moment = require('moment');
 
 async function getLastFlightByPilot(pilotId) {
-    const client = await getClient();
+    const client = await getMongoConnection();
     try {
-        const db = getDB(client);
+        const db = getMongoDatabase(client);
         const flights = db.collection('flights');
         const cursor = await flights.find({ pilotId }).sort({ date: -1 }).limit(1).toArray();
         const latest = cursor.length ? cursor[0] : undefined;
@@ -18,9 +18,9 @@ async function getLastFlightByPilot(pilotId) {
 }
 
 async function inserPilotFlight(flight) {
-    const client = await getClient();
+    const client = await getMongoConnection();
     try {
-        const db = getDB(client);
+        const db = getMongoDatabase(client);
         const flights = db.collection('flights');
 
         const result = await flights.insertOne(flight);

@@ -1,10 +1,11 @@
-const { getClient, getDB } = require('./db');
+const { getMongoConnection, getMongoDatabase } = require('../mongoDBPool');
 const moment = require('moment');
+const DB = process.env.DATABASE || 'lsa_leaderboard';
 
 async function getLatests() {
-  const client = await getClient();
+  const conn = await getMongoConnection();
   try {
-    const db = getDB(client);
+    const db = conn.db(DB);
     const pilots = db.collection('pilots');
     const cursor = await pilots.find({}).sort({ lastUpdatedDate: -1 }).limit(2).toArray();
     const latest = cursor[0];
@@ -12,17 +13,18 @@ async function getLatests() {
     return { latest, previous };
   } catch (err) {
     console.error(err);
+    throw err;
   } finally {
-    await client.close();
+    await conn.close();
   }
 }
 
 async function insertLeaderboard(leaderboard) {
-  const client = await getClient();
+  const conn = await getMongoConnection();
   try {
     const lastUpdatedDate = new Date();
     const lastUpdated = lastUpdatedDate.getTime();
-    const db = getDB(client);
+    const db = conn.db(DB);
     const pilots = db.collection('pilots');
 
     const doc = {
@@ -37,14 +39,14 @@ async function insertLeaderboard(leaderboard) {
   } catch (err) {
     console.error(err);
   } finally {
-    await client.close();
+    await conn.close();
   }
 }
 
 async function updateLeaderboard() {
-  const client = await getClient();
+  const conn = await getMongoConnection();
   try {
-    const db = getDB(client);
+    const db = conn.db(DB);
     const pilots = db.collection('pilots');
 
     const filter = { _id: latest._id };
@@ -60,14 +62,14 @@ async function updateLeaderboard() {
     console.error(err);
 
   } finally {
-    await client.close();
+    await conn.close();
   }
 }
 
 const getLastWeekLeaderboard = async () => {
-  const client = await getClient();
+  const conn = await getMongoConnection();
   try {
-    const db = getDB(client);
+    const db = conn.db(DB);
     const pilots = db.collection('pilots');
 
     const cursor = await pilots.find({ lastUpdatedDate: { $lt: moment().startOf('week').toDate() } }).sort({ lastUpdated: -1 }).limit(1).toArray();
@@ -77,14 +79,14 @@ const getLastWeekLeaderboard = async () => {
     console.error(err);
 
   } finally {
-    await client.close();
+    await conn.close();
   }
 }
 
 async function getDailyTotalFlights() {
-  const client = await getClient();
+  const conn = await getMongoConnection();
   try {
-    const db = getDB(client);
+    const db = conn.db(DB);
     const pilots = db.collection('pilots');
 
     const startDate = moment().startOf('month').toDate();
@@ -149,7 +151,7 @@ async function getDailyTotalFlights() {
     console.error(err);
 
   } finally {
-    await client.close();
+    await conn.close();
   }
 }
 

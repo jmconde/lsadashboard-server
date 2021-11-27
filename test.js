@@ -19,8 +19,8 @@ const getDB = (client) => {
 const doyourthing = async() => {
     let client;
     try {
-        client = await getClient();
-        const db = getDB(client);
+        client = await getMongoConnection();
+        const db = getMongoDatabase(client);
 
         const pilots = db.collection('pilots');
         const startDate = moment().startOf('month').toDate()
@@ -88,8 +88,8 @@ const doyourthing = async() => {
 
         // console.log(cursor.length);
         // cursor.forEach(async (c) => {
-        //     client = await getClient();
-        //     const db = getDB(client);
+        //     client = await getMongoConnection();
+        //     const db = getMongoDatabase(client);
 
         //     const pilots = db.collection('pilots');
         //     console.log(c.date);
@@ -113,7 +113,7 @@ const doyourthing = async() => {
     }
 }
 
-doyourthing()
+// doyourthing()
 
 async function  req() {
     const url = `https://crew.latinstreamingalliance.com/api/acars`;
@@ -128,3 +128,10 @@ async function show() {
 
 // show();
 
+const { getFlightsByDayInMonth } = require('./server/db/mysql/pirepsDB');
+
+
+getFlightsByDayInMonth(10).then(result => {
+    console.log(result);
+    process.exit();
+})

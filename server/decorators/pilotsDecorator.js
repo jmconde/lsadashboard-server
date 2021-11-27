@@ -1,8 +1,8 @@
-const { getLastFlightByPilot } = require('../db/flightsDB');
 const { formatHours } = require('../helpers/timeHelper');
 const moment = require('moment');
 const { mapRank } = require('../helpers/pilotHelper');
-const { getAirport } = require('../db/airportsDB');
+const { getLastFlightByPilot } = require('../db/mongo/flightsDB');
+const { getAirport } = require('../db/mongo/airportsDB');
 const haversine = require('haversine-distance');
 
 const trClasses = (d) => {
