@@ -4,7 +4,8 @@ const router = express.Router();
 const { getAcarsRealTime } = require('../data/acars');
 const orderedPilots = require('../data/pilots');
 const { getDailyTotalFlights } = require('../db/mongo/pilotsDB');
-const { getFlightsByDayInMonth, getFlightsByPilotInMonth } = require('../db/mysql/pirepsDB')
+const { getFlightsByDayInMonth, getFlightsByPilotInMonth } = require('../db/mysql/pirepsDB');
+
 
 router.get('/acars', async (req, res) => {
   const data = await getAcarsRealTime();

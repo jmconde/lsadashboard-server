@@ -31,7 +31,7 @@ async function getFlightsByDayInMonth(month) {
   const result = await query(sql);
   return result.map((d) => {
     d.day = moment(d.date).format('DD');
-    return d;
+    return  {x: d.day, y: d.count};
   });
 }
 
@@ -54,8 +54,8 @@ async function getFlightsByPilotInMonth(month) {
     const name = splitted[0];
     const initial = splitted[1];
     d.name = `${name} ${initial ? initial.substring(0, 1).toUpperCase() : ''}`.trim();
-    return d;
-  }).sort((a, b) => b.count - a.count);
+    return { x: d.name, y: d.count};
+  }).sort((a, b) => b.y - a.y);
 }
 
 module.exports = {
