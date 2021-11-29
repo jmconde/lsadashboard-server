@@ -1,10 +1,11 @@
 const { getMongoConnection, getMongoDatabase } = require('../mongoDBPool');
 const moment = require('moment');
+const DB = process.env.DATABASE || 'lsa_leaderboard';
 
 async function getLastDailyPositions() {
-    const client = await getMongoConnection();
+    const conn = await getMongoConnection();
     try {
-        const db = getMongoDatabase(client);
+        const db = conn.db(DB);
         const dailyPositions = db.collection('dailyPositions');
         const cursor = await dailyPositions.find({}).sort({ lastUpdated: -1 }).limit(1).toArray();
         const latest = cursor[0];
@@ -12,15 +13,15 @@ async function getLastDailyPositions() {
     } catch (err) {
         console.error(err);
     } finally {
-        await client.close();
+        await conn.close();
     }
 
 }
 
 async function insertDailyPositions(positions, date = undefined) {
-    const client = await getMongoConnection();
+    const conn = await getMongoConnection();
     try {
-        const db = getMongoDatabase(client);
+        const db = conn.db(DB);
         const dailyPositions = db.collection('dailyPositions');
         const today = moment(date).utc().startOf('day');
         const doc = {
@@ -34,7 +35,7 @@ async function insertDailyPositions(positions, date = undefined) {
     } catch (err) {
         console.error(err);
     } finally {
-        await client.close();
+        await conn.close();
     }
 }
 

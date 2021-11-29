@@ -1,7 +1,8 @@
 const eta = require('eta');
 const path = require('path');
 const moment = require('moment');
-const uniq = require('lodash/uniq')
+const uniq = require('lodash/uniq');
+const concat = require('lodash/concat');
 const { sortPilots } = require('../helpers/timeHelper');
 const { getLatests } = require('../db/mongo/pilotsDB');
 const { insertAirport, getAirport } = require('../db/mongo/airportsDB');
@@ -16,9 +17,12 @@ const orderedPilots = async() => {
     try {
         const latestsLeaderboards = await getLatests();
         let latest = latestsLeaderboards.latest.leaderboard.sort(sortPilots);
+        let previous = latestsLeaderboards.previous.leaderboard.sort(sortPilots);
         const prevPositions = await getLastDailyPositions();
+        console.log(latest);
         let { lastUpdated } = latestsLeaderboards.latest;
-        const locations = uniq(latest.map(d => d.location));
+        const locations = uniq(concat(latest.map(d => d.location), previous.map(d => d.location)));
+        console.log(locations);
         const airports = {};
         for (let index = 0; index < locations.length; index++) {
             const icao = locations[index];

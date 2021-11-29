@@ -1,10 +1,11 @@
 const { getMongoConnection, getMongoDatabase } = require('../mongoDBPool');
 const moment = require('moment');
+const DB = process.env.DATABASE || 'lsa_leaderboard';
 
 async function getLastFlightByPilot(pilotId) {
-    const client = await getMongoConnection();
+    const conn = await getMongoConnection();
     try {
-        const db = getMongoDatabase(client);
+        const db = conn.db(DB);
         const flights = db.collection('flights');
         const cursor = await flights.find({ pilotId }).sort({ date: -1 }).limit(1).toArray();
         const latest = cursor.length ? cursor[0] : undefined;
@@ -12,15 +13,15 @@ async function getLastFlightByPilot(pilotId) {
     } catch (err) {
         console.error(err);
     } finally {
-        await client.close();
+        await conn.close();
     }
 
 }
 
 async function inserPilotFlight(flight) {
-    const client = await getMongoConnection();
+    const conn = await getMongoConnection();
     try {
-        const db = getMongoDatabase(client);
+        const db = conn.db(DB);
         const flights = db.collection('flights');
 
         const result = await flights.insertOne(flight);
@@ -29,7 +30,7 @@ async function inserPilotFlight(flight) {
     } catch (err) {
         console.error(err);
     } finally {
-        await client.close();
+        await conn.close();
     }
 }
 

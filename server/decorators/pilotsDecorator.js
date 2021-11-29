@@ -34,8 +34,8 @@ const airportLocation = async (icao, airports) => {
             airport = (await getAirport(icao))?.data;
         }
         console.log('<- airport', airport.ident);
-        if (icao === 'UBBB' || icao ==="OITL")
-        console.log(airport);
+        // if (icao === 'LOWI')
+        //     console.log(airport);
         return { lat: airport.latitude_deg, lon: airport.longitude_deg };
     } catch(err) {
         console.log(err);

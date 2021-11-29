@@ -1,24 +1,39 @@
 const { getMongoConnection, getMongoDatabase } = require('../mongoDBPool');
+const DB = process.env.DATABASE || 'lsa_leaderboard';
 
 async function getAirport(icao) {
-    const client = await getMongoConnection();
+    const conn = await getMongoConnection();
     try {
-        const db = getMongoDatabase(client);
+        const db = conn.db(DB);
         const pilots = db.collection('airports');
         const airport = await pilots.findOne({ icao }, {});       
         return airport;
     } catch (err) {
         console.error(err);
     } finally {
-        await client.close();
+        await conn.close();
+    }
+}
+
+async function getAllAirports() {
+    const conn = await getMongoConnection();
+    try {
+        const db = conn.db(DB);
+        const pilots = db.collection('airports');
+        const airport = await pilots.find({}).toArray();       
+        return airport;
+    } catch (err) {
+        console.error(err);
+    } finally {
+        await conn.close();
     }
 }
 
 async function insertAirport(icao, data) {
-    const client = await getMongoConnection();
+    const conn = await getMongoConnection();
     try {
         const lastUpdated = new Date().getTime();
-        const db = getMongoDatabase(client);
+        const db = conn.db(DB);
         const airports = db.collection('airports');
 
         const doc = {
@@ -33,8 +48,8 @@ async function insertAirport(icao, data) {
     } catch (err) {
         console.error(err);
     } finally {
-        await client.close();
+        await conn.close();
     }
 }
 
-module.exports = { insertAirport, getAirport }
+module.exports = { insertAirport, getAirport, getAllAirports }

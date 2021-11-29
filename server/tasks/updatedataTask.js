@@ -15,6 +15,8 @@ const { insertDailyPositions } = require('../db/mongo/dailyPositionsDB');
 const { getPilotsData } = require('../data/pilotsScraper');
 const { sortPilots } = require('../helpers/timeHelper');
 const chalk = require('chalk');
+const { getAllAirports, insertAirport } = require('../db/mongo/airportsDB');
+const { getAirport } = require('../data/airports');
 
 const schedule = process.env.TASK_SCHEDULE || '*/30 * * * *';
 const doNotInsert = process.env.DO_NOT_INSERT == 1;
@@ -22,6 +24,9 @@ const doNotInsert = process.env.DO_NOT_INSERT == 1;
 const task = async() => {
     console.log(chalk `Executing scraper at {blue ${new Date()}} {green (${schedule})}`);
     try {
+        const airports = await getAllAirports();
+        const icaosAvailable = airports.map(d => d.icao);
+        const locations = [];
         const pilotsData = await getPilotsData();
 
         const latestsLeaderboards = await getLatests();
@@ -40,10 +45,25 @@ const task = async() => {
                     destination: pilot.location,
                     seconds: diff
                 };
+                if (!icaosAvailable.includes(pilot.location) && !locations.includes(pilot.location)) {
+                    locations.push(pilot.location);
+                }
+                
+                if (!icaosAvailable.includes(previousData.location) && !locations.includes(previousData.location)) {
+                    locations.push(previousData.location);
+                }
+
                 if (!doNotInsert) {
                     await inserPilotFlight(flight);
                 }
             }
+        });
+                
+        console.log('icaos to insert :>>', locations);
+
+        locations.forEach(async (icao) => {
+            const webAirport = await getAirport(icao);
+            await insertAirport(icao, JSON.parse(JSON.stringify(webAirport)));
         });
 
         if (!doNotInsert) {
@@ -62,7 +82,7 @@ const task = async() => {
 }
 
 module.exports = function() {
-    console.log('process.env.SKIPSCRAPTASK :>> ', process.env.SKIPSCRAPTASK);
+    console.log('process.env.SKIPSCRAPTASK :>> ', process.env.EXECUTE_SCRAP_TASK_ON_START);
     if (process.env.EXECUTE_SCRAP_TASK_ON_START == 1) {
         console.log(chalk `{yellow Executing task on start}`);
         task();
