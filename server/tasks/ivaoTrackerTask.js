@@ -18,7 +18,6 @@ async function task() {
     // if (!flight) {
     await insertIvaoFlight(d);
   }
-  process.exit()
 }
 
 module.exports = function() {
