@@ -1,11 +1,9 @@
 require('dotenv').config();
 
 const { start } = require('./server/server');
-const task = require('./server/tasks/updatedataTask');
+const dataTask = require('./server/tasks/updatedataTask');
+const ivaoTask = require('./server/tasks/ivaoTrackerTask');
 
-
-console.log('process.env :>> ', process.env.ENVIRONMENT);
-console.log('process.env :>> ', process.env.DATABASE);
-
-task();
+dataTask();
+ivaoTask();
 start();

@@ -3,6 +3,12 @@
 // const axios = require('axios');
 // const uri = 'mongodb://root:qwerty123@192.168.1.124:37017';
 
+const { getAirport } = require("./server/data/airports");
+
+
+
+
+
 // const getClient = async() => {
 //     const client = new MongoClient(uri);
 //     await client.connect();
@@ -136,12 +142,33 @@
 //     process.exit();
 // })
 
-const { getAirport } = require('./server/data/airports');
-const { insertAirport, getAllAirports } = require('./server/db/mongo/airportsDB');
+// const { getAirport } = require('./server/data/airports');
+// const { insertAirport, getAllAirports } = require('./server/db/mongo/airportsDB');
 
-(async function (icao) {
-    // const airport = await getAirport(icao);
-    // console.log(airport);
-    // await insertAirport(icao, JSON.parse(JSON.stringify(airport)));
-    console.log(await getAllAirports());
-})('LSZB')
+// (async function (icao) {
+//     // const airport = await getAirport(icao);
+//     // console.log(airport);
+//     // await insertAirport(icao, JSON.parse(JSON.stringify(airport)));
+//     console.log(await getAllAirports());
+// })('LSZB')
+
+// const mysql = require('mysql');
+// const connection = mysql.createConnection({
+//     host: '167.114.57.177',
+//     user: 'latinstr_arhuako',
+//     password: '7iNuE[Fbwopi',
+//     database: 'latinstr_crew'
+//   });
+  
+//   connection.connect((err) => {
+//     if (err) throw err;
+//     console.log('Connected to MySQL Server!');
+//   });
+
+// const { getIvaoVIds } = require("./server/db/mysql/pirepsDB");
+
+// (async function () {
+//   console.log(await getIvaoVIds(9, 0));
+// })()
+
+getAirport('SKBG').then(d => console.log(d))

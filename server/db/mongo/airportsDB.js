@@ -1,5 +1,5 @@
 const { getMongoConnection, getMongoDatabase } = require('../mongoDBPool');
-const DB = process.env.DATABASE || 'lsa_leaderboard';
+const DB = process.env.LSA_MONGO_DB || 'lsa_leaderboard';
 
 async function getAirport(icao) {
     const conn = await getMongoConnection();
@@ -9,7 +9,7 @@ async function getAirport(icao) {
         const airport = await pilots.findOne({ icao }, {});       
         return airport;
     } catch (err) {
-        console.error(err);
+        throw new Error('airport not found in db')
     } finally {
         await conn.close();
     }

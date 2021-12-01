@@ -5,6 +5,7 @@ const apiRouter = require('./router/api');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const  { ApolloServer } = require('apollo-server-express');
+const  { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageDisabled } = require('apollo-server-core');
 const { createServer } = require("http");
 const { readFileSync } = require("fs");
 
@@ -22,7 +23,7 @@ async function start() {
     app.use(bodyParser.json());
     
     app.use(function (req, res, next) {
-        console.log('Time:', Date.now(), req.path);
+        // console.log('Time:', Date.now(), req.path);
         next();
     })
 
@@ -35,10 +36,21 @@ async function start() {
     app.use('/graphql', bodyParser.json());
 
     const server = createServer(app);
-    
-    const apolloServer = new ApolloServer({ typeDefs, resolvers });
-    await apolloServer.start();
-    apolloServer.applyMiddleware({ app });
+    console.log(process.env.environment);
+    try {
+        const apolloServer = new ApolloServer({ 
+            typeDefs, 
+            resolvers,
+            introspection: process.env.environment === 'development',
+            plugins: [
+                process.env.environment === 'development' ? ApolloServerPluginLandingPageGraphQLPlayground() : ApolloServerPluginLandingPageDisabled(),
+            ]
+        });
+        await apolloServer.start();
+        apolloServer.applyMiddleware({ app });
+    } catch(err) {
+        console.log('err :>> ', err);
+    }
 
     server.listen(PORT, () => {
         console.log(`Apollo Server listening at port ${PORT}`)

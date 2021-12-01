@@ -1,6 +1,6 @@
 const { getMongoConnection, getMongoDatabase } = require('../mongoDBPool');
 const moment = require('moment');
-const DB = process.env.DATABASE || 'lsa_leaderboard';
+const DB = process.env.LSA_MONGO_DB || 'lsa_leaderboard';
 
 async function getLastFlightByPilot(pilotId) {
     const conn = await getMongoConnection();

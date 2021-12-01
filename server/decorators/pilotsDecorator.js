@@ -29,6 +29,9 @@ const airportLocation = async (icao, airports) => {
     try {
         console.log('airportLocation', icao);
         let airport = airports[icao];
+        if (!airport) {
+             return undefined;
+        }
         console.log('-> airport', airport && airport.ident);
         if (!airport){
             airport = (await getAirport(icao))?.data;
@@ -66,7 +69,10 @@ async function decorateLeaderboard(leaderboard, previous, airports) {
             const lastFl = await lastFlight(d);
             const originLocation = lastFl ? await airportLocation(lastFl.origin, airports) : undefined;
             const destLocation = await airportLocation(d.location, airports);
-            const distanceInMeters = lastFl && haversine(originLocation, destLocation);
+            let distanceInMeters = 0;
+            if (originLocation && destLocation) {
+                distanceInMeters = lastFl && haversine(originLocation, destLocation);
+            }
             const distance = Math.round(distanceInMeters / 1852);
             const decorators = {
                 _trClasses: trClasses(d),

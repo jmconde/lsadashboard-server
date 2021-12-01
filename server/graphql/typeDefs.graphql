@@ -1,4 +1,5 @@
 scalar DateTime
+# scalar Metric
 
 enum PhotoCategory {
   SELFIE
@@ -44,9 +45,22 @@ type IntDataPoint {
   y: Int
 }
 
+type Metric {
+  metric: Float!,
+  id: String
+}
+
+type IvaoID {
+  user: String!,
+  vid: String,
+}
+
 type Query {
-    monthlyFlightsByPilot(month: Int!) : [IntDataPoint!]!,
-    monthlyFlightsByDay(month: Int!) : [IntDataPoint!]!,
+    monthlyFlightsByPilot(date: String!, unit: String!) : [IntDataPoint!]!,
+    monthlyFlightsByDay(date: String!, unit: String!) : [IntDataPoint!]!,
+    monthlyTotalFlights(date: String!, unit: String!) : Metric!,
+    getMetrics(date: String!, unit: String!) : [Metric!]!
+    getIvaoVIds: [IvaoID!]!
 }
 
 type Mutation {

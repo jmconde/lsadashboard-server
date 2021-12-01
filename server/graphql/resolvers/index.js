@@ -1,7 +1,8 @@
 const Query = require("./Query");
+const DateTime = require("./DateTime")
 
 module.exports = {
-  // DateTime,
+  DateTime,
   // Mutation,
   // Photo,
   Query,

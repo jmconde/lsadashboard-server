@@ -1,5 +1,11 @@
 const { MongoClient } = require('mongodb');
-const uri = 'mongodb://root:qwerty123@192.168.1.124:37017/?maxPoolSize=20';
+const {
+    LSA_MONGO_HOST,
+    LSA_MONGO_PORT,
+    LSA_MONGO_USER,
+    LSA_MONGO_PASS,
+} = process.env;
+const uri = `mongodb://${LSA_MONGO_USER}:${LSA_MONGO_PASS}@${LSA_MONGO_HOST}:${LSA_MONGO_PORT}/?maxPoolSize=20`;
 
 let conn; 
 
@@ -9,7 +15,7 @@ module.exports = {
         return await client.connect();
     },
     getMongoDatabase: (client, db) => {
-        const DB = db || process.env.DATABASE || 'lsa_leaderboard';
+        const DB = db || process.env.LSA_MONGO_DB || 'lsa_leaderboard';
         return client.db(DB);
     }
 };

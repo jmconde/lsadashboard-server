@@ -1,6 +1,15 @@
-const {getFlightsByDayInMonth, getFlightsByPilotInMonth} = require('../../db/mysql/pirepsDB');
+const {
+  getFlightsByDayInMonth, 
+  getFlightsByPilotInMonth, 
+  getTotalFlightsInMonth,
+  getMetrics,
+  getIvaoVIds,
+} = require('../../db/mysql/pirepsDB');
 
 module.exports = {
-  monthlyFlightsByPilot: (parent, args, { db }) => getFlightsByPilotInMonth(10),
-  monthlyFlightsByDay: (parent, args, { db }) => getFlightsByDayInMonth(10)
+  monthlyFlightsByPilot: (parent, { date, unit }) => getFlightsByPilotInMonth(date, unit),
+  monthlyFlightsByDay: (parent, { date, unit }) => getFlightsByDayInMonth(date, unit),
+  monthlyTotalFlights: (parent, { date, unit }) => getTotalFlightsInMonth(date, unit),
+  getMetrics: (parent, { date, unit }) => getMetrics(date, unit),
+  getIvaoVIds: () => getIvaoVIds()
 }

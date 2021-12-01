@@ -19,23 +19,38 @@ const orderedPilots = async() => {
         let latest = latestsLeaderboards.latest.leaderboard.sort(sortPilots);
         let previous = latestsLeaderboards.previous.leaderboard.sort(sortPilots);
         const prevPositions = await getLastDailyPositions();
-        console.log(latest);
         let { lastUpdated } = latestsLeaderboards.latest;
         const locations = uniq(concat(latest.map(d => d.location), previous.map(d => d.location)));
-        console.log(locations);
         const airports = {};
         for (let index = 0; index < locations.length; index++) {
             const icao = locations[index];
-            let airport = await getAirport(icao);
+            
+            if (/[A-Z]{4}/.test(icao)){
+                
+                console.log('yy', icao)
+                let airport;
+                try {
+                    airport = await getAirport(icao);
+                } catch (err) {
+                    console.log('failed', icao);
+                    continue;
+                }
 
-            if (!airport) {
-                airport = await getAirportService(icao);
-                airports[icao] = airport;
-                await insertAirport(icao, JSON.parse(JSON.stringify(airport)));
-            } else {
-                airports[icao] = airport.data;
+                if (!airport) {
+                    try {
+                        airport = await getAirportService(icao);
+                    } catch (err) {
+                        console.log('failed api', icao);
+                        continue;
+                    }
+                    airports[icao] = airport;
+                    await insertAirport(icao, JSON.parse(JSON.stringify(airport)));
+                } else {
+                    airports[icao] = airport.data;
+                }
             }
         }
+        console.log('yy');
         const pilots = await decorateLeaderboard(latest, prevPositions, airports);
         lastUpdated = moment(lastUpdated).utc().format('dddd MMMM Do YYYY [@] HH:mm:ss');
         return {
