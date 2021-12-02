@@ -15,18 +15,67 @@ async function getIvaoFlight(id) {
   }
 }
 
-async function insertIvaoFlight(data) {
+async function insertIvaoTracking(data) {
   let conn;
   try {
     conn = await getMongoConnection();
       
-      const db = conn.db(DB);
-      const collection = db.collection('ivao_tracking');
-      const query = { id: data.id };
-      const update = { $set: data };
-      const options = { upsert: true };
-      await collection.updateOne(query, update, options);;
+    const db = conn.db(DB);
+    const collection = db.collection('ivao_tracking');
+    const query = { id: data.id };
+    const update = { $set: data };
+    const options = { upsert: true };
+    await collection.updateOne(query, update, options);
 
+  } catch (err) {
+      console.error(err);
+  } finally {
+      await conn.close();
+  }
+}
+
+const splitUserName = (username) => {
+  const splitted = username.split(' ');
+  return `${splitted[0]} ${splitted[1].substring(0, 1)}`;
+};
+
+async function insertIvaoFligth(ivaoTracking, activeUserFlight) {
+  let conn;
+  try {
+    
+    const { userId, callsign, lastTrack, flightPlan: { departureId, arrivalId } } = ivaoTracking;
+    const { pirep_id, pilot_id, user_name, flight_number, state, status } = activeUserFlight;
+    const _id = `${userId}${callsign}${departureId}${arrivalId}`;
+    
+    const data = { _id, ... { 
+      ivaoVid: userId, 
+      departureId, 
+      arrivalId, 
+      callsign,
+      lastIvaoState: lastTrack.state,
+      lastIvaoLatitude: lastTrack.latitude,
+      lastIvaoLongitude: lastTrack.longitude,
+      ivaoOnGround: lastTrack.onGround,
+      ivaoTime: lastTrack.time
+     }, 
+      ... {
+        pirep_id,
+        pilot_id,
+        user_name: splitUserName(user_name),
+        flight_number,
+        state, 
+        status
+      }
+    };
+
+    const query = { id: data.id };
+    const update = { $set: data };
+    const options = { upsert: true };
+
+    conn = await getMongoConnection();      
+    const db = conn.db(DB);
+    const collection = db.collection('ivao_flight');
+    await collection.updateOne(query, update, options);
   } catch (err) {
       console.error(err);
   } finally {
@@ -36,5 +85,6 @@ async function insertIvaoFlight(data) {
 
 module.exports = {
   getIvaoFlight,
-  insertIvaoFlight,
+  insertIvaoTracking,
+  insertIvaoFligth,
 }
