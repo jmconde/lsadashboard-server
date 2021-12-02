@@ -68,7 +68,7 @@ async function insertIvaoFligth(ivaoTracking, activeUserFlight) {
       }
     };
 
-    const query = { id: data.id };
+    const query = { _id: data._id };
     const update = { $set: data };
     const options = { upsert: true };
 

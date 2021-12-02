@@ -1,4 +1,4 @@
-// require('dotenv').config();
+require('dotenv').config();
 
 const cron = require('node-cron');
 const { getIvaoWazzup } = require('../data/ivaoWazzup');
@@ -13,7 +13,7 @@ async function task() {
   const v = activeFlights.map(d => Number(d.ivao_vid));
   const ivaoData = await getIvaoWazzup();
   const inIvao = ivaoData.clients.pilots.filter(d => v.includes(d.userId));
-  // console.log(activeFlights);
+  console.log(inIvao);
   for (let index = 0; index < inIvao.length; index++) {
     const ivaoTracking = inIvao[index];
     // console.log(ivaoTracking);
@@ -28,12 +28,14 @@ async function task() {
   }
 }
 
-module.exports = function() {
+// module.exports = function() {
  
-  task();
+//   task();
 
-  cron.schedule('*/20 * * * * *', async() => {
-      task();
-  });
-  console.log('Ivao task scheduled */20 * * * * *')
-}
+//   cron.schedule('*/20 * * * * *', async() => {
+//       task();
+//   });
+//   console.log('Ivao task scheduled */20 * * * * *')
+// }
+
+task();
