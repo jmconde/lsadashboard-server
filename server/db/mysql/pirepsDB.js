@@ -2,7 +2,7 @@ const { getMysqlPool } = require('../mysqlPool');
 const moment = require('moment');
 const { getRangeDate } = require('../../helpers/dateHelper');
 const { PirepState } = require('../../helpers/enums');
-const format = 'YYYY-MM-DD HH:mm:ss'
+const uniq = require('lodash/uniq')
 
 const query = async (sql)  => {
   try {
@@ -117,6 +117,36 @@ async function getActiveFlights() {
   return result;
 }
 
+async  function getPirepsByIds(pirepsIdArray) {
+  const sql = `SELECT * FROM pireps AS p 
+  INNER JOIN users AS u ON p.user_id = u.id
+  WHERE p.id IN (${uniq(pirepsIdArray).map(id => `'${id}' `).join(',')}) AND p.state = 2;`
+
+  const result = await query(sql);
+  return result;
+}
+
+async  function getMetricsTotalByPireps(pirepsIdArray) {
+  const sql = `SELECT 0, 'All', COUNT(*) as flights, SUM(p.flight_time) as total_time
+  FROM pireps AS p 
+  INNER JOIN users AS u ON p.user_id = u.id
+  WHERE p.id IN (${uniq(pirepsIdArray).map(id => `'${id}' `).join(',')}) AND p.state = 2;`
+
+  const result = await query(sql);
+  return result;
+}
+
+async function getMetricsGroupedByPilotByPireps(pirepsIdArray) {
+  const sql = `SELECT u.id, u.name, COUNT(*) as flights, SUM(p.flight_time) as total_time
+  FROM pireps AS p 
+  INNER JOIN users AS u ON p.user_id = u.id
+  WHERE p.id IN (${uniq(pirepsIdArray).map(id => `'${id}' `).join(',')}) AND p.state = 2
+  GROUP BY u.name;`
+
+  const result = await query(sql);
+  return result;
+}
+
 module.exports = {
   getBestLandings,
   getFlightsByDayInMonth,
@@ -125,5 +155,8 @@ module.exports = {
   getMetrics,
   getIvaoVIds,
   getActiveFlights,
+  getPirepsByIds,
+  getMetricsTotalByPireps,
+  getMetricsGroupedByPilotByPireps
 };
 

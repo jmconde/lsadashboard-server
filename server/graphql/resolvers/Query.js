@@ -1,3 +1,4 @@
+const { getIvaoMetrics } = require('../../data/ivaoMetrics');
 const {
   getFlightsByDayInMonth, 
   getFlightsByPilotInMonth, 
@@ -11,5 +12,6 @@ module.exports = {
   monthlyFlightsByDay: (parent, { date, unit }) => getFlightsByDayInMonth(date, unit),
   monthlyTotalFlights: (parent, { date, unit }) => getTotalFlightsInMonth(date, unit),
   getMetrics: (parent, { date, unit }) => getMetrics(date, unit),
-  getIvaoVIds: () => getIvaoVIds()
+  getIvaoVIds: () => getIvaoVIds(),
+  getIvaoMetrics: (parent, { start, end }) => getIvaoMetrics(start, end),
 }

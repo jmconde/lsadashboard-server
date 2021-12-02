@@ -29,6 +29,12 @@ const mapRank = (flightSeconds) => {
     return { code, rank };
 }
 
+const splitUserName = (username) => {
+    const splitted = username.split(' ');
+    return `${splitted[0]} ${splitted[1].substring(0, 1)}`;
+  };
+
 module.exports = {
-    mapRank
+    mapRank,
+    splitUserName
 };

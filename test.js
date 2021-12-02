@@ -1,9 +1,13 @@
+require('dotenv').config();
+
 // const { MongoClient } = require('mongodb');
-// const moment = require('moment');
 // const axios = require('axios');
 // const uri = 'mongodb://root:qwerty123@192.168.1.124:37017';
 
+const moment = require('moment');
 const { getAirport } = require("./server/data/airports");
+const { listIvaoFlight } = require('./server/db/mongo/ivaoTrackerDB');
+const {  getMetricsGroupedByPilotByPireps, getMetricsTotalByPireps } = require('./server/db/mysql/pirepsDB');
 
 
 
@@ -171,4 +175,11 @@ const { getAirport } = require("./server/data/airports");
 //   console.log(await getIvaoVIds(9, 0));
 // })()
 
-getAirport('SKBG').then(d => console.log(d))
+// getAirport('SKBG').then(d => console.log(d))
+
+(async function() {
+  const r = await listIvaoFlight(moment().startOf('month'), moment().endOf('month'))
+  console.log(r.map(d => d.pirep_id));
+  const p = await getMetricsTotalByPireps(r.map(d => d.pirep_id));
+  console.log(p);
+})();

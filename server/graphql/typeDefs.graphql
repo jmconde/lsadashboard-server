@@ -50,9 +50,20 @@ type Metric {
   id: String
 }
 
+type GroupedMetrics {
+  id: Int
+  name: String,
+  metrics: [Metric!]!
+}
+
 type IvaoID {
   user: String!,
   vid: String,
+}
+
+type IvaoMetrics {
+  all: [Metric!]!,
+  byPilot: [GroupedMetrics!]!
 }
 
 type Query {
@@ -61,6 +72,7 @@ type Query {
     monthlyTotalFlights(date: String!, unit: String!) : Metric!,
     getMetrics(date: String!, unit: String!) : [Metric!]!
     getIvaoVIds: [IvaoID!]!
+    getIvaoMetrics(start: String!, end: String!) : IvaoMetrics!
 }
 
 type Mutation {

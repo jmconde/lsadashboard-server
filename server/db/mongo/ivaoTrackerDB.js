@@ -1,14 +1,35 @@
 const { getMongoConnection, getMongoDatabase } = require('../mongoDBPool');
 const DB = process.env.LSA_MONGO_DB || 'lsa_leaderboard';
+const moment = require('moment');
+const { splitUserName } = require('../../helpers/pilotHelper');
 
-async function getIvaoFlight(id) {
+async function getIvaoFlight(_id) {
   const conn = await getMongoConnection();
   try {
       const db = conn.db(DB);
       const collection = db.collection('ivao_tracking');
-      const f = await collection.findOne({ id }, {});       
+      const f = await collection.findOne({ id_ }, {});       
       return f;
   } catch (err) {
+      throw new Error('airport not found in db')
+  } finally {
+      await conn.close();
+  }
+}
+
+
+async function listIvaoFlight(start, end) {
+  const conn = await getMongoConnection();
+  console.log(start, end);
+  try {
+      const db = conn.db(DB);
+      const pilots = db.collection('ivao_flight');
+      const result = await pilots.find({ 
+        updatedAt: { $gte: moment(start).startOf('day').toDate(), $lte: moment(end).startOf('day').toDate() },
+      }).toArray();  
+      return result;
+  } catch (err) {
+    console.log(err);
       throw new Error('airport not found in db')
   } finally {
       await conn.close();
@@ -34,10 +55,10 @@ async function insertIvaoTracking(data) {
   }
 }
 
-const splitUserName = (username) => {
-  const splitted = username.split(' ');
-  return `${splitted[0]} ${splitted[1].substring(0, 1)}`;
-};
+// const splitUserName = (username) => {
+//   const splitted = username.split(' ');
+//   return `${splitted[0]} ${splitted[1].substring(0, 1)}`;
+// };
 
 async function insertIvaoFligth(ivaoTracking, activeUserFlight) {
   let conn;
@@ -45,20 +66,22 @@ async function insertIvaoFligth(ivaoTracking, activeUserFlight) {
     
     const { userId, callsign, lastTrack, flightPlan: { departureId, arrivalId } } = ivaoTracking;
     const { pirep_id, pilot_id, user_name, flight_number, state, status } = activeUserFlight;
-    const _id = `${userId}${callsign}${departureId}${arrivalId}`;
+    const _id = `${pirep_id}${userId}${callsign}${departureId}${arrivalId}`;
+    const updatedAt = new Date();
     
-    const data = { _id, ... { 
-      ivaoVid: userId, 
-      departureId, 
-      arrivalId, 
-      callsign,
-      lastIvaoState: lastTrack.state,
-      lastIvaoLatitude: lastTrack.latitude,
-      lastIvaoLongitude: lastTrack.longitude,
-      ivaoOnGround: lastTrack.onGround,
-      ivaoTime: lastTrack.time
-     }, 
-      ... {
+    const data = { _id, updatedAt,
+      ... { 
+        ivaoVid: userId, 
+        departureId, 
+        arrivalId, 
+        callsign,
+        lastIvaoState: lastTrack.state,
+        lastIvaoLatitude: lastTrack.latitude,
+        lastIvaoLongitude: lastTrack.longitude,
+        ivaoOnGround: lastTrack.onGround,
+        ivaoTime: lastTrack.time
+      }, 
+    ... {
         pirep_id,
         pilot_id,
         user_name: splitUserName(user_name),
@@ -87,4 +110,5 @@ module.exports = {
   getIvaoFlight,
   insertIvaoTracking,
   insertIvaoFligth,
+  listIvaoFlight,
 }
