@@ -12,7 +12,7 @@ async function getIvaoMetrics(start, end) {
     id: 'total_flights',
     metric: total[0].flights
   }, {
-    id: '_total_time',
+    id: 'total_time',
     metric: total[0].total_time
   }];
   const groupedmetrics = grouped.map(g => ({

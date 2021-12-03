@@ -116,7 +116,7 @@ async function getActiveFlights() {
 async  function getPirepsByIds(pirepsIdArray) {
   const sql = `SELECT * FROM pireps AS p 
   INNER JOIN users AS u ON p.user_id = u.id
-  WHERE p.id IN (${uniq(pirepsIdArray).map(id => `'${id}' `).join(',')}) AND p.state = 2;`
+  WHERE p.id IN (${uniq(pirepsIdArray).map(id => `'${id}' `).join(',')}) AND p.state = ${PirepState.ACCEPTED};`
 
   const result = await query(sql);
   return result;
@@ -126,7 +126,7 @@ async  function getMetricsTotalByPireps(pirepsIdArray) {
   const sql = `SELECT 0, 'All', COUNT(*) as flights, SUM(p.flight_time) as total_time
   FROM pireps AS p 
   INNER JOIN users AS u ON p.user_id = u.id
-  WHERE p.id IN (${uniq(pirepsIdArray).map(id => `'${id}' `).join(',')}) AND p.state = 2;`
+  WHERE p.id IN (${uniq(pirepsIdArray).map(id => `'${id}' `).join(',')}) AND p.state = ${PirepState.ACCEPTED};`
 
   const result = await query(sql);
   return result;
@@ -136,7 +136,7 @@ async function getMetricsGroupedByPilotByPireps(pirepsIdArray) {
   const sql = `SELECT u.id, u.name, COUNT(*) as flights, SUM(p.flight_time) as total_time
   FROM pireps AS p 
   INNER JOIN users AS u ON p.user_id = u.id
-  WHERE p.id IN (${uniq(pirepsIdArray).map(id => `'${id}' `).join(',')}) AND p.state = 2
+  WHERE p.id IN (${uniq(pirepsIdArray).map(id => `'${id}' `).join(',')}) AND p.state = ${PirepState.ACCEPTED}
   GROUP BY u.name;`
 
   const result = await query(sql);
