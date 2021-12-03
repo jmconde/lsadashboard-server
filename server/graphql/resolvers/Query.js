@@ -8,10 +8,10 @@ const {
 } = require('../../db/mysql/pirepsDB');
 
 module.exports = {
-  monthlyFlightsByPilot: (parent, { date, unit }) => getFlightsByPilotInMonth(date, unit),
-  monthlyFlightsByDay: (parent, { date, unit }) => getFlightsByDayInMonth(date, unit),
-  monthlyTotalFlights: (parent, { date, unit }) => getTotalFlightsInMonth(date, unit),
-  getMetrics: (parent, { date, unit }) => getMetrics(date, unit),
+  monthlyFlightsByPilot: (parent, { start, end }) => getFlightsByPilotInMonth(start, end),
+  monthlyFlightsByDay: (parent, { start, end }) => getFlightsByDayInMonth(start, end),
+  monthlyTotalFlights: (parent, { start, end }) => getTotalFlightsInMonth(start, end),
+  getMetrics: (parent, { start, end }) => getMetrics(start, end),
   getIvaoVIds: () => getIvaoVIds(),
   getIvaoMetrics: (parent, { start, end }) => getIvaoMetrics(start, end),
 }

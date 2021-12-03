@@ -10,16 +10,14 @@ const getMonthRange = (initMonth, endMonth)  => {
   return [firstDay, lastDay.format(DATE_FORMAT)];
 };
 
-const getRangeDate = ({date = new Date(), unit = 'month'} = {}) => {
-  console.log(date, unit);
-  const firstDay = moment(date).startOf(unit).format(DATE_FORMAT);
-  const lastDay = moment(date).endOf(unit).format(DATE_FORMAT);
-  
-  console.log([firstDay, lastDay]);
+const getFormattedRange = (start, end) => {
+  const firstDay = moment(start).startOf('day').format(DATE_FORMAT);
+  const lastDay = moment(end).endOf('day').format(DATE_FORMAT);
   return [firstDay, lastDay];
 }
 
+
 module.exports = {
-  getMonthRange,
-  getRangeDate,
+  getFormattedRange,
+  getMonthRange
 };

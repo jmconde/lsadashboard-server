@@ -67,10 +67,10 @@ type IvaoMetrics {
 }
 
 type Query {
-    monthlyFlightsByPilot(date: String!, unit: String!) : [IntDataPoint!]!,
-    monthlyFlightsByDay(date: String!, unit: String!) : [IntDataPoint!]!,
-    monthlyTotalFlights(date: String!, unit: String!) : Metric!,
-    getMetrics(date: String!, unit: String!) : [Metric!]!
+    monthlyFlightsByPilot(start: String!, end: String!) : [IntDataPoint!]!,
+    monthlyFlightsByDay(start: String!, end: String!) : [IntDataPoint!]!,
+    monthlyTotalFlights(start: String!, end: String!) : Metric!,
+    getMetrics(start: String!, end: String!) : [Metric!]!
     getIvaoVIds: [IvaoID!]!
     getIvaoMetrics(start: String!, end: String!) : IvaoMetrics!
 }

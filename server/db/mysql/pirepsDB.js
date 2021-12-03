@@ -1,8 +1,8 @@
 const { getMysqlPool } = require('../mysqlPool');
 const moment = require('moment');
-const { getRangeDate } = require('../../helpers/dateHelper');
 const { PirepState } = require('../../helpers/enums');
-const uniq = require('lodash/uniq')
+const uniq = require('lodash/uniq');
+const { getFormattedRange } = require('../../helpers/dateHelper');
 
 const query = async (sql)  => {
   try {
@@ -23,9 +23,8 @@ async function  getBestLandings() {
 }
 
 
-async function getFlightsByDayInMonth(date, unit) {
-  const range = getRangeDate({date, unit});
-
+async function getFlightsByDayInMonth(start, end) {
+  const range = getFormattedRange(start, end);
   const sql = `SELECT 
       CAST(created_at AS DATE) AS date ,
       COUNT(*) as count
@@ -41,9 +40,8 @@ async function getFlightsByDayInMonth(date, unit) {
 }
 
 
-async function getFlightsByPilotInMonth(date, unit) {
-  const range = getRangeDate({date, unit});
-
+async function getFlightsByPilotInMonth(start, end) {
+  const range = getFormattedRange(start, end);
   const sql = `SELECT 
       users.name,
       count(pireps.user_id) count
@@ -61,9 +59,8 @@ async function getFlightsByPilotInMonth(date, unit) {
   }).sort((a, b) => b.y - a.y);
 }
 
-async function getTotalFlightsInMonth(date, unit) {
-  const range = getRangeDate({date, unit});
-
+async function getTotalFlightsInMonth(start, end) {
+  const range = getFormattedRange(start, end);
   const sql = `SELECT 
       count(*) as metric
     FROM pireps
@@ -75,8 +72,8 @@ async function getTotalFlightsInMonth(date, unit) {
 //SELECT u.id, u.name, SUM(p.flight_time) total_time FROM pireps AS p  RIGHT JOIN users as u ON p.user_id = u.id WHERE p.updated_at BETWEEN '2021-12-01' AND '2021-12-31' GROUP BY user_id;
 //SELECT * FROM pireps WHERE status IN ('TXI', 'BST', 'OFB', 'FIN', 'TOF', 'ICL', 'TKO', 'ENR', 'DV', 'APR', 'TEN', 'FIN', 'LDG', 'LAN', 'ONB') AND state = 0 ORDER BY created_at DESC;
 
-async function getMetrics(date, unit) {
-  const range = getRangeDate({date, unit});
+async function getMetrics(start, end) {
+  const range = getFormattedRange(start, end);
   const sql = `SELECT 
       COUNT(*) as total_flights,
     SUM(flight_time) as total_time, 
@@ -85,7 +82,6 @@ async function getMetrics(date, unit) {
       AVG(distance) as avg_distance
     FROM pireps
     WHERE pireps.state = ${PirepState.ACCEPTED} AND created_at BETWEEN '${range[0]}' AND '${range[1]}'`;
-
   const result = await query(sql);
   return Object.keys(result[0]).map(key => ({ id: key, metric: result[0][key] }));
 }
