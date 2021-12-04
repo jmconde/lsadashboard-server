@@ -11,8 +11,10 @@ const getMonthRange = (initMonth, endMonth)  => {
 };
 
 const getFormattedRange = (start, end) => {
+  console.log('dates to format', start, end);
   const firstDay = moment(start).startOf('day').format(DATE_FORMAT);
   const lastDay = moment(end).endOf('day').format(DATE_FORMAT);
+  console.log(' formatted', firstDay, lastDay);
   return [firstDay, lastDay];
 }
 

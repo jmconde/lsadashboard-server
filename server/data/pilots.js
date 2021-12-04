@@ -26,13 +26,10 @@ const orderedPilots = async() => {
             const icao = locations[index];
             
             if (/[A-Z]{4}/.test(icao)){
-                
-                console.log('yy', icao)
                 let airport;
                 try {
                     airport = await getAirport(icao);
                 } catch (err) {
-                    console.log('failed', icao);
                     continue;
                 }
 
@@ -40,7 +37,7 @@ const orderedPilots = async() => {
                     try {
                         airport = await getAirportService(icao);
                     } catch (err) {
-                        console.log('failed api', icao);
+                        console.log('failed airport api', icao);
                         continue;
                     }
                     airports[icao] = airport;
@@ -50,7 +47,6 @@ const orderedPilots = async() => {
                 }
             }
         }
-        console.log('yy');
         const pilots = await decorateLeaderboard(latest, prevPositions, airports);
         lastUpdated = moment(lastUpdated).utc().format('dddd MMMM Do YYYY [@] HH:mm:ss');
         return {
