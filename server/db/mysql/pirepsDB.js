@@ -82,6 +82,7 @@ async function getMetrics(start, end) {
       AVG(distance) as avg_distance
     FROM pireps
     WHERE pireps.state = ${PirepState.ACCEPTED} AND created_at BETWEEN '${range[0]}' AND '${range[1]}'`;
+    console.log(sql);
   const result = await query(sql);
   return Object.keys(result[0]).map(key => ({ id: key, metric: result[0][key] }));
 }
@@ -123,7 +124,10 @@ async  function getPirepsByIds(pirepsIdArray) {
 }
 
 async  function getMetricsTotalByPireps(pirepsIdArray) {
-  const sql = `SELECT 0, 'All', COUNT(*) as flights, SUM(p.flight_time) as total_time
+  const sql = `SELECT COUNT(*) as total_flights, SUM(p.flight_time) as total_time, 
+  SUM(p.distance) as total_distance,
+  AVG(p.flight_time) as avg_time,
+  AVG(p.distance) as avg_distance
   FROM pireps AS p 
   INNER JOIN users AS u ON p.user_id = u.id
   WHERE p.id IN (${uniq(pirepsIdArray).map(id => `'${id}' `).join(',')}) AND p.state = ${PirepState.ACCEPTED};`
@@ -133,7 +137,10 @@ async  function getMetricsTotalByPireps(pirepsIdArray) {
 }
 
 async function getMetricsGroupedByPilotByPireps(pirepsIdArray) {
-  const sql = `SELECT u.id, u.name, COUNT(*) as flights, SUM(p.flight_time) as total_time
+  const sql = `SELECT u.id, u.name, COUNT(*) as total_flights, SUM(p.flight_time) as total_time,
+  SUM(p.distance) as total_distance,
+  AVG(p.flight_time) as avg_time,
+  AVG(p.distance) as avg_distance
   FROM pireps AS p 
   INNER JOIN users AS u ON p.user_id = u.id
   WHERE p.id IN (${uniq(pirepsIdArray).map(id => `'${id}' `).join(',')}) AND p.state = ${PirepState.ACCEPTED}
