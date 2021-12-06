@@ -20,29 +20,33 @@ async function getIvaoFlight(_id) {
 
 async function listIvaoFlight(start, end) {
   const conn = await getMongoConnection();
-  console.log(start, end);
   try {
       const db = conn.db(DB);
       const pilots = db.collection('ivao_flight');
       const result = await pilots.find({ 
-        updatedAt: { $gte: moment(start).startOf('day').toDate(), $lte: moment(end).startOf('day').toDate() },
-      }).toArray();  
+        updatedAt: { 
+          $gte: moment(start).startOf('day').toDate(), 
+          $lte: moment(end).startOf('day').toDate(),
+        },
+        lastIvaoState: {
+          $in: ['Landed', 'On Blocks']
+        }
+      }).toArray();
       return result;
   } catch (err) {
-    console.log(err);
-      throw new Error('airport not found in db')
+    throw new Error(err)
   } finally {
       await conn.close();
   }
 }
 
-async function insertIvaoTracking(data) {
+async function insertIvaoTracking(data, notInAirline) {
   let conn;
   try {
     conn = await getMongoConnection();
       
     const db = conn.db(DB);
-    const collection = db.collection('ivao_tracking');
+    const collection = db.collection(!notInAirline ? 'ivao_tracking' : 'ivao_not_in_airline');
     const query = { id: data.id };
     const update = { $set: data };
     const options = { upsert: true };

@@ -5,7 +5,7 @@ const dataTask = require('./server/tasks/updatedataTask');
 const ivaoTask = require('./server/tasks/ivaoTrackerTask');
 
 dataTask();
-if (!process.env.SKIP_IVAO_TASK) {
+if (!Number(process.env.SKIP_IVAO_TASK)) {
   ivaoTask();
 }
 start();

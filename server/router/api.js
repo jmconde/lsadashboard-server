@@ -8,8 +8,15 @@ const { getFlightsByDayInMonth, getFlightsByPilotInMonth } = require('../db/mysq
 
 
 router.get('/acars', async (req, res) => {
-  const data = await getAcarsRealTime();
-  res.status(200).json(data);
+  try {
+    const data = await getAcarsRealTime();
+    res.status(200).json(data);
+  } catch(err) {
+    const { status, statusText } = err.response;
+    res.status(status).json({
+      statusText
+    });
+  }
 });
 
 router.get('/pilots', async (req, res) => {
@@ -17,8 +24,12 @@ router.get('/pilots', async (req, res) => {
     const data = await orderedPilots();
 
     res.status(200).json(data);
-  }catch(err) {
-    console.log(err);
+  }catch(err) {    
+    const { status, statusText } = err.response;
+    res.status(status).json({
+      status,
+      statusText,
+    });
   }
 });
 

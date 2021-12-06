@@ -19,7 +19,7 @@ const { getAllAirports, insertAirport } = require('../db/mongo/airportsDB');
 const { getAirport } = require('../data/airports');
 
 const schedule = process.env.TASK_SCHEDULE || '*/30 * * * *';
-const doNotInsert = process.env.DO_NOT_INSERT == 1;
+const doNotInsert = !!Number(process.env.DO_NOT_INSERT);
 
 const task = async() => {
     console.log(chalk `Executing scraper at {blue ${new Date()}} {green (${schedule})}`);
@@ -83,12 +83,12 @@ const task = async() => {
 
 module.exports = function() {
     console.log('process.env.SKIPSCRAPTASK :>> ', process.env.EXECUTE_SCRAP_TASK_ON_START);
-    if (process.env.EXECUTE_SCRAP_TASK_ON_START == 1) {
+    if (Number(process.env.EXECUTE_SCRAP_TASK_ON_START)) {
         console.log(chalk `{yellow Executing task on start}`);
         task();
     }
 
-    if (process.env.SKIP_SCRAP_TASK == 1) {
+    if (Number(process.env.SKIP_SCRAP_TASK)) {
         console.log(chalk `{red scrapper task skipped}`);
         return;
     }

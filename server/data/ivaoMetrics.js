@@ -10,9 +10,7 @@ async function getIvaoMetrics(start, end) {
   const pirepsList = ivaoFlights.map(d => d.pirep_id);
   const total = await getMetricsTotalByPireps(pirepsList);
   const grouped = await getMetricsGroupedByPilotByPireps(pirepsList);
-  console.log(total);
   const allmetrics = METRICS_FIELDS.map(key => ({ id: key, metric: total[0][key] }));
-  console.log(allmetrics);
   // const allmetrics = [{
   //   id: 'total_flights',
   //   metric: total[0].flights
@@ -20,7 +18,6 @@ async function getIvaoMetrics(start, end) {
   //   id: 'total_time',
   //   metric: total[0].total_time
   // }];
-  console.log(grouped);
   const groupedmetrics = grouped.map(g => ({
     id: g.id,
     name: splitUserName(g.name),
