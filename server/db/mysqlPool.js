@@ -30,6 +30,17 @@ async function getMysqlPool() {
   }
 }
 
+
+const query = async (sql)  => {
+  try {
+    const pool = await getMysqlPool();
+    return pool.query(sql);
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
-  getMysqlPool
+  getMysqlPool,
+  query
 };

@@ -1,17 +1,8 @@
-const { getMysqlPool } = require('../mysqlPool');
+const { query } = require('../mysqlPool');
 const moment = require('moment');
 const { PirepState } = require('../../helpers/enums');
 const uniq = require('lodash/uniq');
 const { getFormattedRange } = require('../../helpers/dateHelper');
-
-const query = async (sql)  => {
-  try {
-    const pool = await getMysqlPool();
-    return pool.query(sql);
-  } catch(err) {
-    console.log(err);
-  }
-}
 
 async function  getBestLandings() {
   const sql = `SELECT t1.created_at, CAST(t1.value as SIGNED) AS rate , t2.user_id, t3.name\
@@ -124,6 +115,9 @@ async  function getPirepsByIds(pirepsIdArray) {
 }
 
 async  function getMetricsTotalByPireps(pirepsIdArray) {
+  if (!pirepsIdArray.length) {
+    return [];
+  }
   const sql = `SELECT COUNT(*) as total_flights, SUM(p.flight_time) as total_time, 
   SUM(p.distance) as total_distance,
   AVG(p.flight_time) as avg_time,
@@ -137,6 +131,9 @@ async  function getMetricsTotalByPireps(pirepsIdArray) {
 }
 
 async function getMetricsGroupedByPilotByPireps(pirepsIdArray) {
+  if (!pirepsIdArray.length) {
+    return [];
+  }
   const sql = `SELECT u.id, u.name, COUNT(*) as total_flights, SUM(p.flight_time) as total_time,
   SUM(p.distance) as total_distance,
   AVG(p.flight_time) as avg_time,

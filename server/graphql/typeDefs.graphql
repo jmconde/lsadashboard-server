@@ -1,45 +1,5 @@
 scalar DateTime
 # scalar Metric
-
-enum PhotoCategory {
-  SELFIE
-  PORTRAIT
-  ACTION
-  LANDSCAPE
-  GRAPHIC
-}
-
-type AuthPayload {
-  token: String!
-  user: User!
-}
-
-type User {
-  id: ID!,
-  githubLogin: String!
-  name: String
-  avatar: String
-  postedPhotos: [Photo!]!
-  inPhotos: [Photo!]!
-}
-
-type Photo {
-  id: ID!
-  url: String!
-  name: String!
-  description: String
-  category: PhotoCategory!
-  postedBy: User!
-  taggedUsers: [User!]!
-  created: DateTime!
-}
-
-input PostPhotoInput {
-  name: String!
-  category: PhotoCategory=PORTRAIT
-  description: String
-}
-
 type IntDataPoint {
   x: String,
   y: Int
@@ -66,6 +26,49 @@ type IvaoMetrics {
   byPilot: [GroupedMetrics!]!
 }
 
+type Flight {
+  pilotId: Int
+  departure: String!
+  arrival: String!
+  time: Int
+  distance: Float
+  date: String!
+  landingRate: Float
+  state: String
+  status: String
+}
+
+type Pilot {
+  id: Int!
+  pilotId: String!
+  name: String!
+  rankId: Int
+  rankName: String
+  country: String
+  home: String
+  location: String
+  flights: Int
+  flightTime: Int
+  status: Int
+  state: Int
+  joined: String
+  lastFlight: Flight
+}
+
+type Aircraft {
+  id: Int!
+  type: String!
+  name: String!
+  registration: String!
+  state: String!
+  status: String!
+  location: String
+  fleet: String
+  hub: String
+  fuelOnboard: Float
+  flightTime: Int
+}
+
 type Query {
     monthlyFlightsByPilot(start: String!, end: String!) : [IntDataPoint!]!,
     monthlyFlightsByDay(start: String!, end: String!) : [IntDataPoint!]!,
@@ -73,16 +76,18 @@ type Query {
     getMetrics(start: String!, end: String!) : [Metric!]!
     getIvaoVIds: [IvaoID!]!
     getIvaoMetrics(start: String!, end: String!) : IvaoMetrics!
+    getAircraftList: [Aircraft!]!
+    getActivePilotList: [Pilot!]!
 }
 
-type Mutation {
-  fakeUserAuth(githubLogin: ID!): AuthPayload!
-  addFakeUsers(count: Int=1): [User!]!
-  postPhoto(input: PostPhotoInput!): Photo!
-  githubAuth(code: String!): AuthPayload!
-}
+# type Mutation {
+#   fakeUserAuth(githubLogin: ID!): AuthPayload!
+#   addFakeUsers(count: Int=1): [User!]!
+#   postPhoto(input: PostPhotoInput!): Photo!
+#   githubAuth(code: String!): AuthPayload!
+# }
 
-type Subscription {
-  newPhoto: Photo!
-  newUser: User!
-}
+# type Subscription {
+#   newPhoto: Photo!
+#   newUser: User!
+# }

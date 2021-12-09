@@ -32,9 +32,16 @@ const mapRank = (flightSeconds) => {
 const splitUserName = (username) => {
     const splitted = username.split(' ');
     return `${splitted[0]} ${splitted[1].substring(0, 1)}`;
-  };
+};
+
+const getPilotId = (numId) => {
+  const power = numId < 1000 ? 10 ** 3 : 10 ** (String(numId).length )
+  const strId = String(power + numId).substring(1);
+  return `LTS${strId}`
+}
 
 module.exports = {
     mapRank,
-    splitUserName
+    splitUserName,
+    getPilotId,
 };

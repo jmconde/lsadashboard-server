@@ -110,9 +110,24 @@ async function insertIvaoFligth(ivaoTracking, activeUserFlight) {
   }
 }
 
+async function getIvaoFlightsByPireps(pireps) {
+  let conn = await getMongoConnection();
+  try {
+      const db = conn.db(DB);
+      const collection = db.collection('ivao_flight');
+      const f = await collection.find({ pirep_id: { $in: pireps } }).toArray();       
+      return f;
+  } catch (err) {
+      throw new Error('airport not found in db')
+  } finally {
+      await conn.close();
+  }
+}
+
 module.exports = {
   getIvaoFlight,
   insertIvaoTracking,
   insertIvaoFligth,
   listIvaoFlight,
+  getIvaoFlightsByPireps,
 }
