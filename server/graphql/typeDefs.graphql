@@ -24,6 +24,7 @@ type IvaoID {
 type IvaoMetrics {
   all: [Metric!]!,
   byPilot: [GroupedMetrics!]!
+  byDay: [GroupedMetrics!]!
 }
 
 type Flight {

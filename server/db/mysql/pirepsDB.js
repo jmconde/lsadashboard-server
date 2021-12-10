@@ -73,7 +73,6 @@ async function getMetrics(start, end) {
       AVG(distance) as avg_distance
     FROM pireps
     WHERE pireps.state = ${PirepState.ACCEPTED} AND created_at BETWEEN '${range[0]}' AND '${range[1]}'`;
-    console.log(sql);
   const result = await query(sql);
   return Object.keys(result[0]).map(key => ({ id: key, metric: result[0][key] }));
 }
@@ -147,6 +146,26 @@ async function getMetricsGroupedByPilotByPireps(pirepsIdArray) {
   return result;
 }
 
+async function getMetricsGroupedByDayByPireps(pirepsIdArray) {
+  if (!pirepsIdArray.length) {
+    return [];
+  }
+  const sql = `SELECT  DAY(p.created_at) as day,
+  p.created_at,
+  CONCAT(MONTH(p.created_at), '-', DAY(p.created_at)) as monthday,
+  COUNT(*) as total_flights, SUM(p.flight_time) as total_time,
+  SUM(p.distance) as total_distance,
+  AVG(p.flight_time) as avg_time,
+  AVG(p.distance) as avg_distance
+FROM pireps AS p 
+  INNER JOIN users AS u ON p.user_id = u.id 
+  WHERE p.id IN (${uniq(pirepsIdArray).map(id => `'${id}' `).join(',')}) AND p.state = ${PirepState.ACCEPTED}
+  GROUP BY monthday ORDER BY day;`
+
+  const result = await query(sql);
+  return result;
+}
+
 module.exports = {
   getBestLandings,
   getFlightsByDayInMonth,
@@ -157,6 +176,7 @@ module.exports = {
   getActiveFlights,
   getPirepsByIds,
   getMetricsTotalByPireps,
-  getMetricsGroupedByPilotByPireps
+  getMetricsGroupedByPilotByPireps,
+  getMetricsGroupedByDayByPireps,
 };
 
