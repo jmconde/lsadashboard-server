@@ -8,7 +8,8 @@ async function getAircraftList() {
   const sql = `SELECT a.id, s.type, s.name fleet, s.hub_id AS hub, a.airport_id as location, a.name, a.registration, a.state, a.status, a.flight_time AS flightTime, a.fuel_onboard AS fuelOnboard
     FROM aircraft AS a 
     INNER JOIN subfleets AS s 
-      ON s.id = a.subfleet_id;`;
+      ON s.id = a.subfleet_id
+    ORDER BY s.type ASC;`;
 
   const result = await query(sql);
 

@@ -1,4 +1,7 @@
-const { getIvaoMetrics } = require('../../data/ivaoMetrics');
+const { 
+  getIvaoMetrics, 
+  getIvaoNotInAirlineMetrics,
+} = require('../../data/ivaoMetrics');
 const { getAircraftList } = require('../../db/mysql/aircraftsDB');
 const { getActivePilotList } = require('../../db/mysql/pilotDB');
 const {
@@ -16,6 +19,7 @@ module.exports = {
   getMetrics: (parent, { start, end }) => getMetrics(start, end),
   getIvaoVIds: () => getIvaoVIds(),
   getIvaoMetrics: (parent, { start, end }) => getIvaoMetrics(start, end),
+  getIvaoNotInAirlineMetrics: (parent, { start, end }) => getIvaoNotInAirlineMetrics(start, end),
   getAircraftList: () => getAircraftList(),
   getActivePilotList: () => getActivePilotList(),
 }

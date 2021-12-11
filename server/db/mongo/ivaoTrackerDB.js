@@ -3,6 +3,8 @@ const DB = process.env.LSA_MONGO_DB || 'lsa_leaderboard';
 const moment = require('moment');
 const { splitUserName } = require('../../helpers/pilotHelper');
 
+const IVAO_LANDED_STATES = ['Landed', 'On Blocks'];
+
 async function getIvaoFlight(_id) {
   const conn = await getMongoConnection();
   try {
@@ -29,7 +31,7 @@ async function listIvaoFlight(start, end) {
           $lte: moment(end).startOf('day').toDate(),
         },
         lastIvaoState: {
-          $in: ['Landed', 'On Blocks']
+          $in: IVAO_LANDED_STATES
         }
       }).toArray();
       return result;
@@ -118,9 +120,42 @@ async function getIvaoFlightsByPireps(pireps) {
       const f = await collection.find({ pirep_id: { $in: pireps } }).toArray();       
       return f;
   } catch (err) {
-      throw new Error('airport not found in db')
+      throw new Error('Error getting ivao flights by pireps');
   } finally {
       await conn.close();
+  }
+}
+
+async function getIvaoFlightsNotInAirline(start, end) {
+  let conn = await getMongoConnection();
+  try {
+    const db = conn.db('lsa_leaderboard');
+    const ivaoFlightsCol = db.collection('ivao_not_in_airline');
+    const startDate = moment().startOf('month').toDate();
+    const cursor = await ivaoFlightsCol.aggregate([
+      { 
+          $addFields: {
+              date: {
+                  $dateFromString: {
+                      "dateString": "$lastTrack.timestamp"
+                  }
+              }
+          }
+      }, {
+          $match: {
+              date:  { $gt: startDate, $lte: new Date() },
+              'lastTrack.state': { $in: IVAO_LANDED_STATES }
+          }
+      }, {
+          $sort: { date: 1 }
+      }
+    ]).toArray();
+
+    return cursor;
+  } catch(err) {
+    throw new Error('Error getting ivao flights not in airline');
+  } finally {
+    await conn.close();
   }
 }
 
@@ -130,4 +165,5 @@ module.exports = {
   insertIvaoFligth,
   listIvaoFlight,
   getIvaoFlightsByPireps,
+  getIvaoFlightsNotInAirline,
 }

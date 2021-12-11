@@ -78,14 +78,14 @@ async function getMetrics(start, end) {
 }
 
 async function getIvaoVIds() {
-  const sql = `SELECT users.id, user_field_values.value as VID 
+  const sql = `SELECT users.id as user, user_field_values.value as vid
     FROM users
     INNER JOIN user_field_values
       ON users.id = user_field_values.user_id WHERE user_field_id = 1`
     ;
 
   const result = await query(sql);
-  return result.map(d => ({ user: d.id, vid: d.VID}));
+  return result;
 };
 
 async function getActiveFlights() {
@@ -153,14 +153,15 @@ async function getMetricsGroupedByDayByPireps(pirepsIdArray) {
   const sql = `SELECT  DAY(p.created_at) as day,
   p.created_at,
   CONCAT(MONTH(p.created_at), '-', DAY(p.created_at)) as monthday,
-  COUNT(*) as total_flights, SUM(p.flight_time) as total_time,
+  COUNT(*) as total_flights, 
+  SUM(p.flight_time) as total_time,
   SUM(p.distance) as total_distance,
   AVG(p.flight_time) as avg_time,
   AVG(p.distance) as avg_distance
 FROM pireps AS p 
   INNER JOIN users AS u ON p.user_id = u.id 
   WHERE p.id IN (${uniq(pirepsIdArray).map(id => `'${id}' `).join(',')}) AND p.state = ${PirepState.ACCEPTED}
-  GROUP BY monthday ORDER BY day;`
+  GROUP BY monthday ORDER BY day`
 
   const result = await query(sql);
   return result;

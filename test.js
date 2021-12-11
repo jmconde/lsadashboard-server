@@ -7,6 +7,7 @@ require('dotenv').config();
 const moment = require('moment');
 const { getAirport } = require("./server/data/airports");
 const { listIvaoFlight } = require('./server/db/mongo/ivaoTrackerDB');
+const { getMongoConnection } = require('./server/db/mongoDBPool');
 const {  getMetricsGroupedByPilotByPireps, getMetricsTotalByPireps } = require('./server/db/mysql/pirepsDB');
 
 
@@ -27,18 +28,39 @@ const {  getMetricsGroupedByPilotByPireps, getMetricsTotalByPireps } = require('
 
 
 const doyourthing = async() => {
-    let client;
+    let conn;
     try {
-        client = await getMongoConnection();
-        const db = getMongoDatabase(client);
+        conn = await getMongoConnection();
+        const db = conn.db('lsa_leaderboard');
 
-        const ivaoFlights = db.collection('ivao_flight');
+        const ivaoFlightsCol = db.collection('ivao_not_in_airline');
         const startDate = moment().startOf('month').toDate()
-
         console.log(startDate);
-        console.log(new Date());
+        // const cursor = await ivaoFlightsCol.find({ 'lastTrack.timestamp': { $gt: startDate, $lte: new Date() } }).sort({ lastUpdatedDate: 1 }).toArray();
+        const cursor = await ivaoFlightsCol.aggregate([
+            { 
+                $addFields: {
+                    date: {
+                        $dateFromString: {
+                            "dateString": "$lastTrack.timestamp"
+                        }
+                    }
+                }
+            }, {
+                $match: {
+                    date:  { $gt: startDate, $lte: new Date() }
+                }
+            }, {
+                $sort: { date: 1 }
+            }
+        ]).toArray();
+        // { 'lastTrack.timestamp': { $gt: startDate, $lte: new Date() } }).sort({ lastUpdatedDate: 1 }).toArray();
+        console.log(cursor);
+        
 
-        const cursor = await pilots.find({ lastUpdatedDate: { $gt: startDate, $lte: new Date() } }).sort({ lastUpdatedDate: 1 }).toArray();
+        // console.log(startDate);
+        // console.log(new Date());
+
         
         // const cursor = await pilots.aggregate([
         //     { $sort: { lastUpdatedDate: 1} },
@@ -80,21 +102,21 @@ const doyourthing = async() => {
         //     // { $group: { _id: '$onlyday' , totalFlights: { $max: '$totalFlights' } } },
         //     { $sort: { date: 1} },
         // ]).toArray();
-        console.log(cursor[0], cursor[cursor.length - 1]);
-        const mapdata = cursor.reduce((acc, d) => {
-            const day = moment(d.lastUpdatedDate).date();
-            const fday = acc[day];
-            const sum = d.leaderboard.reduce((acc, val) => {
-                const f = Number(val.flights) || 0;
-                return acc += f;
-            }, 0);
+        // console.log(cursor[0], cursor[cursor.length - 1]);
+        // const mapdata = cursor.reduce((acc, d) => {
+        //     const day = moment(d.lastUpdatedDate).date();
+        //     const fday = acc[day];
+        //     const sum = d.leaderboard.reduce((acc, val) => {
+        //         const f = Number(val.flights) || 0;
+        //         return acc += f;
+        //     }, 0);
 
-            if (!fday || sum > fday) {
-                acc[day] = sum;
-            }
-            return acc;
-        }, {});
-        console.log(Object.keys(mapdata).map(key => ({ day: key, flights: mapdata[key] })).sort((a, b) => a.flights - b.flights));
+        //     if (!fday || sum > fday) {
+        //         acc[day] = sum;
+        //     }
+        //     return acc;
+        // }, {});
+        // console.log(Object.keys(mapdata).map(key => ({ day: key, flights: mapdata[key] })).sort((a, b) => a.flights - b.flights));
 
         // console.log(cursor.length);
         // cursor.forEach(async (c) => {
@@ -119,7 +141,7 @@ const doyourthing = async() => {
 
         // console.log(lastUpdated);
     } finally {
-        (await client).close();
+        (await conn).close();
     }
 }
 
