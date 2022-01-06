@@ -7,7 +7,7 @@ const { getIvaoPilots } = require("../db/mysql/pilotDB");
 const METRICS_FIELDS = ['total_flights' , 'total_time', 'total_distance', 'avg_time', 'avg_distance']
 
 async function getIvaoMetrics(start, end) {
-  const ivaoFlights = await listIvaoFlight(moment(start).utc().startOf('day'), moment(end).utc().endOf('day'));
+  const ivaoFlights = await listIvaoFlight(start, end);
   const pirepsList = ivaoFlights.map(d => d.pirep_id);
   const total = await getMetricsTotalByPireps(pirepsList);
   const groupedByPilot = await getMetricsGroupedByPilotByPireps(pirepsList);

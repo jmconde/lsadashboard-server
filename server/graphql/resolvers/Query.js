@@ -5,17 +5,21 @@ const {
 const { getAircraftList } = require('../../db/mysql/aircraftsDB');
 const { getActivePilotList } = require('../../db/mysql/pilotDB');
 const {
-  getFlightsByDayInMonth, 
-  getFlightsByPilotInMonth, 
-  getTotalFlightsInMonth,
+  getFlightsByDay, 
+  getFlightsByPilot, 
+  getTimeByPilot,
+  getTimeByDay,
+  getTotalFlights,
   getMetrics,
   getIvaoVIds,
 } = require('../../db/mysql/pirepsDB');
 
 module.exports = {
-  monthlyFlightsByPilot: (parent, { start, end }) => getFlightsByPilotInMonth(start, end),
-  monthlyFlightsByDay: (parent, { start, end }) => getFlightsByDayInMonth(start, end),
-  monthlyTotalFlights: (parent, { start, end }) => getTotalFlightsInMonth(start, end),
+  getFlightsByPilot: (parent, { start, end }) => getFlightsByPilot(start, end),
+  getTimeByPilot: (parent, { start, end }) => getTimeByPilot(start, end),
+  getFlightsByDay: (parent, { start, end }) => getFlightsByDay(start, end),
+  getTotalFlights: (parent, { start, end }) => getTotalFlights(start, end),
+  getTimeByDay: (parent, { start, end }) => getTimeByDay(start, end),
   getMetrics: (parent, { start, end }) => getMetrics(start, end),
   getIvaoVIds: () => getIvaoVIds(),
   getIvaoMetrics: (parent, { start, end }) => getIvaoMetrics(start, end),

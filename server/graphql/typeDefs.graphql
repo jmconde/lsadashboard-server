@@ -71,9 +71,11 @@ type Aircraft {
 }
 
 type Query {
-    monthlyFlightsByPilot(start: String!, end: String!) : [IntDataPoint!]!,
-    monthlyFlightsByDay(start: String!, end: String!) : [IntDataPoint!]!,
-    monthlyTotalFlights(start: String!, end: String!) : Metric!,
+    getFlightsByPilot(start: String!, end: String!) : [IntDataPoint!]!,
+    getTimeByPilot(start: String!, end: String!) : [IntDataPoint!]!,
+    getFlightsByDay(start: String!, end: String!) : [IntDataPoint!]!,
+    getTimeByDay(start: String!, end: String!) : [IntDataPoint!]!,
+    getTotalFlights(start: String!, end: String!) : Metric!,
     getMetrics(start: String!, end: String!) : [Metric!]!
     getIvaoVIds: [IvaoID!]!
     getIvaoMetrics(start: String!, end: String!) : IvaoMetrics!

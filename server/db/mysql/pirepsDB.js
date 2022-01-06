@@ -2,7 +2,7 @@ const { query } = require('../mysqlPool');
 const moment = require('moment');
 const { PirepState } = require('../../helpers/enums');
 const uniq = require('lodash/uniq');
-const { getFormattedRange } = require('../../helpers/dateHelper');
+const { getFormattedRange, getContinuosDateArray } = require('../../helpers/dateHelper');
 
 async function  getBestLandings() {
   const sql = `SELECT t1.created_at, CAST(t1.value as SIGNED) AS rate , t2.user_id, t3.name\
@@ -14,8 +14,9 @@ async function  getBestLandings() {
 }
 
 
-async function getFlightsByDayInMonth(start, end) {
+async function getFlightsByDay(start, end) {
   const range = getFormattedRange(start, end);
+  const datesArray = getContinuosDateArray(start, end);
   const sql = `SELECT 
       CAST(created_at AS DATE) AS date ,
       COUNT(*) as count
@@ -24,14 +25,46 @@ async function getFlightsByDayInMonth(start, end) {
     GROUP by date
     ORDER BY date;`
   const result = await query(sql);
-  return result.map((d) => {
-    d.day = moment(d.date).format('DD');
-    return  {x: d.day, y: d.count};
+
+  return datesArray.map((d) => {
+    const day = d.split('-').pop();
+    const f = result.find(x => moment(x.date).format('DD') === day);
+
+    return {
+      x: day,
+      y: f ? f.count : 0
+    };
   });
 }
 
 
-async function getFlightsByPilotInMonth(start, end) {
+async function getTimeByDay(start, end) {
+  const range = getFormattedRange(start, end);
+  const datesArray = getContinuosDateArray(start, end);
+  const sql = `SELECT 
+      CAST(created_at AS DATE) AS date ,
+      sum(pireps.flight_time) time
+    FROM pireps 
+    WHERE pireps.state = ${PirepState.ACCEPTED} AND created_at BETWEEN '${range[0]}' and '${range[1]}' 
+    GROUP by date
+    ORDER BY date;`
+  const result = await query(sql);
+
+  // result.forEach(d => console.log(moment(d.date).format('DD')))
+
+  return datesArray.map((d) => {
+    const day = d.split('-').pop();
+    const f = result.find(x => moment(x.date).format('DD') === day);
+
+    return {
+      x: day,
+      y: f ? f.time : 0
+    };
+  });
+}
+
+
+async function getFlightsByPilot(start, end) {
   const range = getFormattedRange(start, end);
   const sql = `SELECT 
       users.name,
@@ -40,6 +73,7 @@ async function getFlightsByPilotInMonth(start, end) {
     LEFT JOIN users ON pireps.user_id = users.id
     WHERE pireps.state = ${PirepState.ACCEPTED} AND pireps.created_at BETWEEN '${range[0]}' and '${range[1]}' 
     GROUP BY pireps.user_id;`
+
   const result = await query(sql);
   return result.map((d) => {
     const splitted = d.name.split(' ');
@@ -50,7 +84,26 @@ async function getFlightsByPilotInMonth(start, end) {
   }).sort((a, b) => b.y - a.y);
 }
 
-async function getTotalFlightsInMonth(start, end) {
+async function getTimeByPilot(start, end) {
+  const range = getFormattedRange(start, end);
+  const sql = `SELECT 
+      users.name,
+      sum(pireps.flight_time) time
+    FROM pireps
+    LEFT JOIN users ON pireps.user_id = users.id
+    WHERE pireps.state = ${PirepState.ACCEPTED} AND pireps.created_at BETWEEN '${range[0]}' and '${range[1]}' 
+    GROUP BY pireps.user_id;`
+  const result = await query(sql);
+  return result.map((d) => {
+    const splitted = d.name.split(' ');
+    const name = splitted[0];
+    const initial = splitted[1];
+    d.name = `${name} ${initial ? initial.substring(0, 1).toUpperCase() : ''}`.trim();
+    return { x: d.name, y: d.time};
+  }).sort((a, b) => b.y - a.y);
+}
+
+async function getTotalFlights(start, end) {
   const range = getFormattedRange(start, end);
   const sql = `SELECT 
       count(*) as metric
@@ -169,9 +222,9 @@ FROM pireps AS p
 
 module.exports = {
   getBestLandings,
-  getFlightsByDayInMonth,
-  getFlightsByPilotInMonth,
-  getTotalFlightsInMonth,
+  getFlightsByDay,
+  getFlightsByPilot,
+  getTotalFlights,
   getMetrics,
   getIvaoVIds,
   getActiveFlights,
@@ -179,5 +232,7 @@ module.exports = {
   getMetricsTotalByPireps,
   getMetricsGroupedByPilotByPireps,
   getMetricsGroupedByDayByPireps,
+  getTimeByPilot,
+  getTimeByDay,
 };
 

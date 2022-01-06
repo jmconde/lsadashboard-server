@@ -11,15 +11,28 @@ const getMonthRange = (initMonth, endMonth)  => {
 };
 
 const getFormattedRange = (start, end) => {
-  console.log('dates to format', start, end);
+  // console.log('dates to format', start, end);
   const firstDay = moment(start).startOf('day').format(DATE_FORMAT);
   const lastDay = moment(end).endOf('day').format(DATE_FORMAT);
-  console.log(' formatted', firstDay, lastDay);
+  // console.log(' formatted', firstDay, lastDay);
   return [firstDay, lastDay];
+}
+
+const getContinuosDateArray = (start, end, allowAfterToday = false) => {
+  const today = moment();
+  const date = moment(start);
+  const lastDay = moment(end);
+  const arr = [];
+  while((allowAfterToday || (!allowAfterToday && date.isSameOrBefore(today))) && date.isSameOrBefore(lastDay)) {
+    arr.push(date.format('YYYY-MM-DD'));
+    date.add(1, 'days');
+  }
+  return arr;
 }
 
 
 module.exports = {
   getFormattedRange,
-  getMonthRange
+  getMonthRange,
+  getContinuosDateArray,
 };

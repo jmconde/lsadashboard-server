@@ -27,8 +27,8 @@ async function listIvaoFlight(start, end) {
       const pilots = db.collection('ivao_flight');
       const result = await pilots.find({ 
         updatedAt: { 
-          $gte: moment(start).startOf('day').toDate(), 
-          $lte: moment(end).startOf('day').toDate(),
+          $gte: moment(start).toDate(), 
+          $lte: moment(end).toDate(),
         },
         lastIvaoState: {
           $in: IVAO_LANDED_STATES
