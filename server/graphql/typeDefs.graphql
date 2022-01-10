@@ -27,10 +27,19 @@ type IvaoMetrics {
   byDay: [GroupedMetrics!]!
 }
 
+type Airport {
+  id: String!
+  lat: Float!
+  lon: Float!
+  name: String!
+  location: String!,
+  country: String!
+}
+
 type Flight {
   pilotId: Int
-  departure: String!
-  arrival: String!
+  departure: Airport!
+  arrival: Airport!
   time: Int
   distance: Float
   date: String!
@@ -47,7 +56,7 @@ type Pilot {
   rankName: String
   country: String
   home: String
-  location: String
+  location: Airport!
   flights: Int
   flightTime: Int
   status: Int

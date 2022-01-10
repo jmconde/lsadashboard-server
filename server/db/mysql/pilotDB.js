@@ -35,20 +35,65 @@ async function getIvaoPilots() {
   return result;
 };
 
+async function getAirportsFromList(airports) {
+  const sql = `SELECT a.icao, a.name, a.location, a.country, a.lat, a.lon 
+  FROM airports AS a 
+  WHERE icao IN (${airports.map(d => `'${d}'`).join(',')});`;
+  let result = await query(sql);
+
+  return result.reduce((acc, d) => {
+    acc[d.icao] = {
+      id: d.icao,
+      lat: d.lat,
+      lon: d.lon,
+      name: d.name,
+      location: d.location,
+      country: d.country,
+    };
+    return acc;
+  }, {});
+}
+
 async function getActivePilotList() {
   let sql = SQL + ACTIVE_WHERE + ` ORDER BY ${MAP[ORDER_BY_FLIGHT_TIME]} DESC`
   const lastFlights = await getPilotsLastFlight();
   let result = await query(sql);
   
+  let airports = lastFlights.reduce((acc, d) => {
+    acc[d.departure] = 1;
+    acc[d.arrival] = 1;
+
+    return acc;
+  }, {});
+
+  airports = result.reduce((acc, d) => {
+    acc[d.location] = 1;
+    acc[d.home] = 1;
+
+    return acc;
+  }, airports);
+  
+  airports = Object.keys(airports).sort();
+  airports = await getAirportsFromList(airports);
+  // console.log(airports);
+  
   result = result.map((user) => {
+    const lastFlight = lastFlights.find(f => user.id === f.pilotId);
+    if (lastFlight) {
+      console.log(lastFlight.departure, lastFlight.arrival);
+      console.log(airports[lastFlight.departure], airports[lastFlight.arrival]);
+      lastFlight.departure = airports[lastFlight.departure];
+      lastFlight.arrival = airports[lastFlight.arrival];
+      user.lastFlight = lastFlight;      
+    }
+    user.location = airports[user.location];
     user.name = splitUserName(user.name);
     user.state = UserStateFromDB[user.state];
     user.pilotId = getPilotId(user.pilotId, 'LTS');
-    user.lastFlight = lastFlights.find(f => user.id === f.pilotId);
     return user;
   });
-  // console.log(result);
-  return result
+
+  return result;
 }
 
 async function getPilotList() {
@@ -81,7 +126,7 @@ async function getPilotsLastFlight() {
       date: d.created_at,
       landingRate: d.landing_rate,
       state: PirepState[d.state],
-      status: PirepStatus[d.status]
+      status: PirepStatus[d.status],
     }
   });
 }
