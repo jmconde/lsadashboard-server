@@ -29,23 +29,34 @@ type IvaoMetrics {
 
 type Airport {
   id: String!
-  lat: Float!
-  lon: Float!
-  name: String!
-  location: String!,
-  country: String!
+  lat: Float
+  lon: Float
+  name: String
+  location: String
+  country: String
 }
 
 type Flight {
-  pilotId: Int
-  departure: Airport!
-  arrival: Airport!
-  time: Int
-  distance: Float
-  date: String!
+  pilot: Pilot
+  departure: Airport
+  arrival: Airport
+  alternate: Airport
+  time: Int!
+  plannedTime: Float
+  distance: Float!
+  plannedDistance: Float
   landingRate: Float
   state: String
   status: String
+  pirepId: String
+  number: String
+  type: String
+  blockFuel: Float
+  usedFuel: Float
+  route: String
+  aircraft: Aircraft
+  blockOffTime: String
+  blockOnTime: String
 }
 
 type Pilot {
@@ -56,13 +67,14 @@ type Pilot {
   rankName: String
   country: String
   home: String
-  location: Airport!
+  location: Airport
   flights: Int
   flightTime: Int
   status: Int
   state: Int
   joined: String
   lastFlight: Flight
+  vid: String
 }
 
 type Aircraft {
@@ -72,7 +84,7 @@ type Aircraft {
   registration: String!
   state: String!
   status: String!
-  location: String
+  location: Airport
   fleet: String
   hub: String
   fuelOnboard: Float
@@ -91,6 +103,7 @@ type Query {
     getIvaoNotInAirlineMetrics(start: String!, end: String!) : IvaoMetrics!
     getAircraftList: [Aircraft!]!
     getActivePilotList: [Pilot!]!
+    getLogFlights(start: String!, end: String!): [Flight!]!
 }
 
 # type Mutation {

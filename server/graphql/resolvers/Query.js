@@ -3,7 +3,7 @@ const {
   getIvaoNotInAirlineMetrics,
 } = require('../../data/ivaoMetrics');
 const { getAircraftList } = require('../../db/mysql/aircraftsDB');
-const { getActivePilotList } = require('../../db/mysql/pilotDB');
+const { getActivePilotList, getPilotList} = require('../../db/mysql/pilotDB');
 const {
   getFlightsByDay, 
   getFlightsByPilot, 
@@ -12,6 +12,7 @@ const {
   getTotalFlights,
   getMetrics,
   getIvaoVIds,
+  getLogFlights,
 } = require('../../db/mysql/pirepsDB');
 
 module.exports = {
@@ -26,4 +27,5 @@ module.exports = {
   getIvaoNotInAirlineMetrics: (parent, { start, end }) => getIvaoNotInAirlineMetrics(start, end),
   getAircraftList: () => getAircraftList(),
   getActivePilotList: () => getActivePilotList(),
+  getLogFlights: (parent, { start, end }) => getLogFlights(start, end),
 }

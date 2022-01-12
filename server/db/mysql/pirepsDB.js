@@ -1,8 +1,12 @@
 const { query } = require('../mysqlPool');
 const moment = require('moment');
 const { PirepState } = require('../../helpers/enums');
+const { PirepState: PirepStateFromDB, PirepStatus: PirepStatusFromDB  } = require('../../helpers/enumsFromDb');
 const uniq = require('lodash/uniq');
 const { getFormattedRange, getContinuosDateArray } = require('../../helpers/dateHelper');
+const { getAirports } = require('./airportsDB');
+const { getPilotList } = require('./pilotDB');
+const { getAircraftList } = require('./aircraftsDB');
 
 async function  getBestLandings() {
   const sql = `SELECT t1.created_at, CAST(t1.value as SIGNED) AS rate , t2.user_id, t3.name\
@@ -150,7 +154,7 @@ async function getActiveFlights() {
   INNER JOIN aircraft as a ON a.id = p.aircraft_id
   INNER JOIN subfleets AS s ON s.id = a.subfleet_id
   INNER JOIN user_field_values AS ufv ON u.id = ufv.user_id
-  WHERE ufv.user_field_id = 1 AND p.status IN ('TXI', 'BST', 'OFB', 'FIN', 'TOF', 'ICL', 'TKO', 'ENR', 'DV', 'APR', 'TEN', 'FIN', 'LDG', 'LAN', 'ONB') AND p.state = 0
+  WHERE ufv.user_field_id = 1 AND p.status IN ('TXI', 'BST', 'OFB', 'FIN', 'TOF', 'ICL', 'TKO', 'ENR', 'DV', 'APR', 'TEN', 'FIN', 'LDG', 'LAN', 'ONB') AND p.state = ${PirepState.IN_PROGRESS}
   ORDER BY p.created_at DESC;`
 
   const result = await query(sql);
@@ -220,6 +224,74 @@ FROM pireps AS p
   return result;
 }
 
+async function getLogFlights(start, end) {
+  const airports =  await getAirports();
+  const pilots = await getPilotList();
+  const aircrafts = await getAircraftList();
+  console.log(start, end);
+  const range = getFormattedRange(start, end);
+  console.log(range);
+  const sql = `SELECT 
+    p.id as pirepId, 
+    ufv.value as vid, 
+    u.id as pilotId, 
+    u.name AS user_name, 
+    CONCAT('LTS', p.flight_number) AS number, 
+    p.flight_type AS type, 
+    p.dpt_airport_id AS departure, 
+    p.arr_airport_id AS arrival, 
+    p.alt_airport_id AS alternate, 
+    p.planned_distance AS plannedDistance, 
+    p.distance, 
+    p.flight_time AS time,
+    p.planned_flight_time AS plannedTime,
+    p.block_fuel AS blockFuel, 
+    p.fuel_used AS usedFuel, 
+    p.landing_rate as landingRate, 
+    p.route, 
+    p.state, 
+    p.status,
+    a.icao, 
+    a.registration, 
+    s.name,
+    a.id as aircraftId,
+    p.block_off_time AS blockOffTime,
+    p.block_on_time AS blockOnTime
+  FROM pireps AS p 
+  INNER JOIN users AS u ON p.user_id = u.id
+  INNER JOIN aircraft as a ON a.id = p.aircraft_id
+  INNER JOIN subfleets AS s ON s.id = a.subfleet_id
+  INNER JOIN user_field_values AS ufv ON u.id = ufv.user_id
+  WHERE p.state = ${PirepState.ACCEPTED}
+    AND p.created_at BETWEEN '${range[0]}' and '${range[1]}'
+  ORDER BY p.block_off_time DESC;`
+  const result = await query(sql);
+  return result.map((d) => {
+    return {  
+      pilot: pilots.find(p => p.id === d.pilotId ),
+      departure: airports[d.departure] ||  { id: d.departure },
+      arrival: airports[d.arrival] || { id: d.arrival },
+      alternate: d.alternate ? airports[d.alternate] || { id: d.alternate } : undefined,
+      time: d.time,
+      plannedTime: d.plannedTime,
+      distance: d.distance,
+      plannedDistance: d.plannedDistance,
+      landingRate: d.landingRate,
+      state: PirepStateFromDB[d.state],
+      status: PirepStatusFromDB[d.status],
+      pirepId: d.pirepId,
+      number: d.number,
+      type: d.type,
+      blockFuel: d.blockFuel,
+      usedFuel: d.usedFuel,
+      route: d.route,
+      aircraft: aircrafts[d.aircraftId],
+      blockOffTime: moment(d.blockOffTime).format('YYYY-MM-DD HH:mm:ss'),
+      blockOnTime: moment(d.blockOnTime).format('YYYY-MM-DD HH:mm:ss'),
+    };
+  });
+}
+
 module.exports = {
   getBestLandings,
   getFlightsByDay,
@@ -234,5 +306,6 @@ module.exports = {
   getMetricsGroupedByDayByPireps,
   getTimeByPilot,
   getTimeByDay,
+  getLogFlights,
 };
 
