@@ -1,6 +1,6 @@
 {
   "name": "lab",
-  "version": "2.5.1",
+  "version": "2.6.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -28,6 +28,7 @@
     "graphql": "^15.7.2",
     "haversine-distance": "^1.2.1",
     "lodash": "^4.17.21",
+    "memcache-plus": "^0.2.22",
     "memcached": "^2.2.2",
     "memjs": "^1.3.0",
     "moment": "^2.29.1",

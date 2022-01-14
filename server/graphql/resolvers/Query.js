@@ -3,6 +3,7 @@ const {
   getIvaoNotInAirlineMetrics,
 } = require('../../data/ivaoMetrics');
 const { getAircraftList } = require('../../db/mysql/aircraftsDB');
+const { getAirportsArray } = require('../../db/mysql/airportsDB');
 const { getActivePilotList, getPilotList} = require('../../db/mysql/pilotDB');
 const {
   getFlightsByDay, 
@@ -28,4 +29,5 @@ module.exports = {
   getAircraftList: () => getAircraftList(),
   getActivePilotList: () => getActivePilotList(),
   getLogFlights: (parent, { start, end }) => getLogFlights(start, end),
+  getAirportList: (parent) => getAirportsArray()
 }

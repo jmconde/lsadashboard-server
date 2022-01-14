@@ -2,6 +2,7 @@ const axios = require('axios');
 const { isEmpty } = require('lodash');
 const { getIvaoFlightsByPireps } = require('../db/mongo/ivaoTrackerDB');
 const url = 'https://crew.latinstreamingalliance.com/api/acars';
+const geosonUrl =  (id) => `https://crew.latinstreamingalliance.com/api/pireps/${id}/acars/geojson`;
 
 const getAcarsRealTime = async () => {
   const response = await axios.get(url);
@@ -16,4 +17,9 @@ const getAcarsRealTime = async () => {
   };
 };
 
-module.exports = { getAcarsRealTime };
+const getGeoson = async (pirepId) => {
+  const response = await axios.get(geosonUrl(pirepId));
+  return response.data
+};
+
+module.exports = { getAcarsRealTime, getGeoson };

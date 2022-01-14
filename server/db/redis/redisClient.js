@@ -46,9 +46,10 @@ async function getJSON(key) {
   return JSON.parse(val);
 }
 
-async function set(key, value, options){
+async function set(key, value, options =  {}){
   return new Promise((resolve, reject) => {
-    getClient().set(key, value, 1000 * 60 * 30, (err) => {
+    const { minutes = 5  } = options;
+    getClient().set(key, value, minutes * 60, (err) => {
       if (err) {
         reject(err);
         return;

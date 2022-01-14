@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { getAcarsRealTime } = require('../data/acars');
+const { getAcarsRealTime, getGeoson } = require('../data/acars');
 const orderedPilots = require('../data/pilots');
 const { getDailyTotalFlights } = require('../db/mongo/pilotsDB');
 const { getFlightsByDayInMonth, getFlightsByPilotInMonth } = require('../db/mysql/pirepsDB');
@@ -10,6 +10,19 @@ const { getFlightsByDayInMonth, getFlightsByPilotInMonth } = require('../db/mysq
 router.get('/acars', async (req, res) => {
   try {
     const data = await getAcarsRealTime();
+    res.status(200).json(data);
+  } catch(err) {
+    const { status, statusText } = err.response;
+    res.status(status).json({
+      statusText
+    });
+  }
+});
+
+router.get('/geoson/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const data = await getGeoson(id);
     res.status(200).json(data);
   } catch(err) {
     const { status, statusText } = err.response;

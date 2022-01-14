@@ -27,6 +27,21 @@ type IvaoMetrics {
   byDay: [GroupedMetrics!]!
 }
 
+type Frequency {
+  type: String
+  description: String
+  frequency_mhz: String
+}
+type Navaid {
+  ident: String
+  name: String
+  type: String
+  lat: Float
+  lon: Float
+  elevation: Float
+  frequency_khz: Float
+}
+
 type Airport {
   id: String!
   lat: Float
@@ -34,6 +49,9 @@ type Airport {
   name: String
   location: String
   country: String
+  elevation: Float
+  frequencies: [Frequency!]
+  navaids: [Navaid!]
 }
 
 type Flight {
@@ -104,6 +122,7 @@ type Query {
     getAircraftList: [Aircraft!]!
     getActivePilotList: [Pilot!]!
     getLogFlights(start: String!, end: String!): [Flight!]!
+    getAirportList: [Airport!]!
 }
 
 # type Mutation {

@@ -51,7 +51,7 @@ async function getIvaoPilots() {
 };
 
 async function getActivePilotList() {
-  const pilots = await getPilotList();
+  const pilots = await getPilotList() || [];
   return pilots.filter(d => d.state === 'ACTIVE');
 }
 
