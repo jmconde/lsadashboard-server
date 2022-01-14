@@ -12,6 +12,6 @@ mongorestore --host=*** --port=37017 --username=*** --password=***** --db=lsa_le
 docker image pull arhuako/lsadashboardapi
 docker image ls
 docker-compose stop
-docker-compose up --build -d
+docker-compose up --build -d --remove-orphans
 docker-compose logs --follow
 ```
